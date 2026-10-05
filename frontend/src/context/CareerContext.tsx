@@ -567,10 +567,10 @@ export function CareerProvider({
 
   /**
    * Optimistic task toggle engine:
-   * 1. Instantly flips task completed flag in pathways in 0ms (<16ms frame budget).
-   * 2. Adds or subtracts XP immediately (+task.xp_reward).
-   * 3. Promotes/demotes user skill state and calculates updated readiness score instantly.
-   * 4. Asynchronously syncs with backend diagnostics in background.
+   * 1. Functional updater for pathways preventing stale closure overwrites on rapid clicks.
+   * 2. Instant XP delta addition/subtraction.
+   * 3. Pure computation and application of user skills and weighted readiness.
+   * 4. Asynchronous background sync completely outside of any setState updater.
    */
   const toggleTask = useCallback(
     (taskId: string) => {
@@ -578,118 +578,130 @@ export function CareerProvider({
       let matchedTask: MilestoneTask | null = null;
       let nextCompleted = false;
 
-      const nextPathways = pathways.map((pathway) => ({
-        ...pathway,
-        tasks: pathway.tasks.map((task) => {
-          if (task.id === taskId) {
-            nextCompleted = !task.completed;
-            matchedTask = task;
-            return { ...task, completed: nextCompleted };
-          }
-          return task;
-        }),
-      }));
+      for (const pathway of pathways) {
+        const found = pathway.tasks.find((t) => t.id === taskId);
+        if (found) {
+          matchedTask = found;
+          nextCompleted = !found.completed;
+          break;
+        }
+      }
 
       if (!matchedTask) return;
 
-      const deltaXp = nextCompleted ? (matchedTask as MilestoneTask).xp_reward : -(matchedTask as MilestoneTask).xp_reward;
-      const targetSkillId = (matchedTask as MilestoneTask).target_skill_id;
+      const deltaXp = nextCompleted ? matchedTask.xp_reward : -matchedTask.xp_reward;
+      const targetSkillId = matchedTask.target_skill_id;
 
-      // Check how many tasks for this focus skill are completed now
-      const allFocusTasks = nextPathways
+      // 1. Functional update for pathways (avoids stale closure on rapid sequential toggling)
+      setPathways((prevPathways) =>
+        prevPathways.map((pathway) => ({
+          ...pathway,
+          tasks: pathway.tasks.map((task) => {
+            if (task.id === taskId) {
+              return { ...task, completed: nextCompleted };
+            }
+            return task;
+          }),
+        }))
+      );
+
+      // Compute how many tasks for this focus skill are completed after this toggle
+      const allFocusTasks = pathways
         .flatMap((p) => p.tasks)
         .filter((t) => t.target_skill_id === targetSkillId);
-      const completedFocusTasks = allFocusTasks.filter((t) => t.completed).length;
-      const allCompleted = completedFocusTasks === allFocusTasks.length && allFocusTasks.length > 0;
 
-      // 1. Instant optimistic state update: XP
-      setXp((prev) => Math.max(0, prev + deltaXp));
-      setPathways(nextPathways);
-
-      // 2. Instant optimistic state update: User Skills progression
-      setUserSkills((prevSkills) => {
-        const existingIdx = prevSkills.findIndex((s) => s.skill_id === targetSkillId);
-        let updatedList: UserSkillState[];
-
-        if (existingIdx >= 0) {
-          const current = prevSkills[existingIdx];
-          const newDepth = allCompleted
-            ? SkillDepth.APPLIED
-            : completedFocusTasks > 0
-            ? Math.max(current.current_depth, SkillDepth.CONCEPTUAL)
-            : current.current_depth;
-
-          const newConfidence = allCompleted
-            ? 0.95
-            : completedFocusTasks > 0
-            ? Math.min(0.9, Math.max(0.65, current.confidence_score + 0.15))
-            : Math.max(0.4, current.confidence_score - 0.15);
-
-          const newSource = allCompleted ? "ARTIFACT_VERIFIED" : current.verification_source;
-
-          updatedList = [
-            ...prevSkills.slice(0, existingIdx),
-            {
-              ...current,
-              current_depth: newDepth,
-              confidence_score: newConfidence,
-              verification_source: newSource,
-            },
-            ...prevSkills.slice(existingIdx + 1),
-          ];
-        } else {
-          // New skill acquired through practical project completion
-          updatedList = [
-            ...prevSkills,
-            {
-              skill_id: targetSkillId,
-              current_depth: allCompleted ? SkillDepth.APPLIED : SkillDepth.CONCEPTUAL,
-              confidence_score: allCompleted ? 0.95 : 0.7,
-              verification_source: "ARTIFACT_VERIFIED",
-            },
-          ];
+      const completedFocusTasks = allFocusTasks.reduce((count, t) => {
+        if (t.id === taskId) {
+          return count + (nextCompleted ? 1 : 0);
         }
+        return count + (t.completed ? 1 : 0);
+      }, 0);
 
-        // 3. Instant optimistic readiness score recalculation
-        const instantReadiness = calculateWeightedReadiness(updatedList, targetRole);
-        setReadinessScore(instantReadiness);
+      const allCompleted =
+        completedFocusTasks === allFocusTasks.length && allFocusTasks.length > 0;
 
-        // Also update local diagnostic report reflectively
-        setDiagnosticReport((prevReport) => {
-          if (!prevReport) return null;
-          return {
-            ...prevReport,
-            readiness_percentage: instantReadiness,
-          };
-        });
+      // 2. Pure computation of updated skills list
+      const existingIdx = userSkills.findIndex((s) => s.skill_id === targetSkillId);
+      let updatedSkillsList: UserSkillState[];
 
-        // 4. Background Server Synchronization (Asynchronous, non-blocking)
-        setIsSyncing(true);
-        api
-          .analyzeDiagnostics({
-            current_role_id: currentRoleId,
-            target_role_id: targetRoleId,
-            user_skills: updatedList,
-          })
-          .then((verifiedReport) => {
-            if (verifiedReport) {
-              setDiagnosticReport(verifiedReport);
-              setReadinessScore(verifiedReport.readiness_percentage);
-            }
-            setLastSyncedAt(new Date());
-          })
-          .catch(() => {
-            // Keep optimistic client state intact if server is unreachable
-            setLastSyncedAt(new Date());
-          })
-          .finally(() => {
-            setIsSyncing(false);
-          });
+      if (existingIdx >= 0) {
+        const current = userSkills[existingIdx];
+        const newDepth = allCompleted
+          ? SkillDepth.APPLIED
+          : completedFocusTasks > 0
+          ? Math.max(current.current_depth, SkillDepth.CONCEPTUAL)
+          : current.current_depth;
 
-        return updatedList;
+        const newConfidence = allCompleted
+          ? 0.95
+          : completedFocusTasks > 0
+          ? Math.min(0.9, Math.max(0.65, current.confidence_score + 0.15))
+          : Math.max(0.4, current.confidence_score - 0.15);
+
+        const newSource = allCompleted ? "ARTIFACT_VERIFIED" : current.verification_source;
+
+        updatedSkillsList = [
+          ...userSkills.slice(0, existingIdx),
+          {
+            ...current,
+            current_depth: newDepth,
+            confidence_score: newConfidence,
+            verification_source: newSource,
+          },
+          ...userSkills.slice(existingIdx + 1),
+        ];
+      } else {
+        // New skill acquired through practical project completion
+        updatedSkillsList = [
+          ...userSkills,
+          {
+            skill_id: targetSkillId,
+            current_depth: allCompleted ? SkillDepth.APPLIED : SkillDepth.CONCEPTUAL,
+            confidence_score: allCompleted ? 0.95 : 0.7,
+            verification_source: "ARTIFACT_VERIFIED",
+          },
+        ];
+      }
+
+      // 3. Instant optimistic state updates
+      setXp((prev) => Math.max(0, prev + deltaXp));
+      setUserSkills(updatedSkillsList);
+
+      const instantReadiness = calculateWeightedReadiness(updatedSkillsList, targetRole);
+      setReadinessScore(instantReadiness);
+
+      setDiagnosticReport((prevReport) => {
+        if (!prevReport) return null;
+        return {
+          ...prevReport,
+          readiness_percentage: instantReadiness,
+        };
       });
+
+      // 4. Background Server Synchronization (Asynchronous, completely outside of any setState updater)
+      setIsSyncing(true);
+      api
+        .analyzeDiagnostics({
+          current_role_id: currentRoleId,
+          target_role_id: targetRoleId,
+          user_skills: updatedSkillsList,
+        })
+        .then((verifiedReport) => {
+          if (verifiedReport) {
+            setDiagnosticReport(verifiedReport);
+            setReadinessScore(verifiedReport.readiness_percentage);
+          }
+          setLastSyncedAt(new Date());
+        })
+        .catch(() => {
+          // Keep optimistic client state intact if server is unreachable
+          setLastSyncedAt(new Date());
+        })
+        .finally(() => {
+          setIsSyncing(false);
+        });
     },
-    [pathways, targetRole, currentRoleId, targetRoleId]
+    [pathways, userSkills, targetRole, currentRoleId, targetRoleId]
   );
 
   const toggleStealthMode = useCallback((enabled?: boolean) => {
