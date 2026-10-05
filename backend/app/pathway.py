@@ -281,21 +281,29 @@ class PathwayGenerator:
             self._prereq_graph.add_edge(src, dst)
 
     def _sequence_skills(self, gap_skill_ids: Sequence[str]) -> List[str]:
-        """Topologically orders gap skill IDs so prerequisite foundations come first."""
+        """Topologically orders gap skill IDs so prerequisite foundations come first,
+        accounting for transitive reachability across intermediate skills in the DAG.
+        """
         unique_gaps = list(dict.fromkeys(gap_skill_ids))
         if not unique_gaps:
             return []
 
-        # Subgraph of requested skills including implicit prerequisite paths
+        # Subgraph of requested skills with transitive reachability edges
         subgraph = nx.DiGraph()
         for skill in unique_gaps:
             subgraph.add_node(skill)
 
-        for src, dst in SKILL_PREREQUISITES:
-            if src in unique_gaps and dst in unique_gaps:
-                subgraph.add_edge(src, dst)
+        for u in unique_gaps:
+            for v in unique_gaps:
+                if u != v:
+                    if (
+                        self._prereq_graph.has_node(u)
+                        and self._prereq_graph.has_node(v)
+                        and nx.has_path(self._prereq_graph, u, v)
+                    ):
+                        subgraph.add_edge(u, v)
 
-        # Topological sort if DAG, fallback to topological rank or preserve order
+        # Topological sort if DAG, fallback to original order on cycle
         try:
             ordered = list(nx.topological_sort(subgraph))
             return ordered

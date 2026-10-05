@@ -108,3 +108,41 @@ def test_resume_parser_empty_and_unknown():
 def test_resume_parser_standalone_function():
     result = parse_resume_text("Skilled in Python, React, and PostgreSQL.")
     assert any(s.skill_id in ["react-state", "sql-optimization"] for s in result["extracted_skills"])
+
+
+def test_pathway_transitive_prerequisites():
+    generator = PathwayGenerator(CareerGraphEngine())
+    # rest-apis -> sql-optimization -> system-design (intermediate sql-optimization is not in gaps)
+    gaps = ["system-design", "rest-apis"]
+    pathway = generator.generate_pathway("staff-architect", gaps)
+    assert len(pathway) == 2
+    focus_order = [m.focus_skill_id for m in pathway]
+    assert focus_order == ["rest-apis", "system-design"]
+
+
+def test_resume_parser_local_context_isolation():
+    parser = ResumeParser()
+    filler = " " * 300
+    sample_text = f"""
+    Chief Systems Architect and Technical Lead.
+    {filler}
+    Additional competencies:
+    Elementary familiarity with SQL databases.
+    {filler}
+    Docker.
+    """
+    result = parser.parse(sample_text)
+    extracted_dict = {s.skill_id: s for s in result["extracted_skills"]}
+    
+    assert "sql-optimization" in extracted_dict
+    sql_skill = extracted_dict["sql-optimization"]
+    # Elementary clue in local window should evaluate to CONCEPTUAL, not ARCHITECTURAL
+    assert sql_skill.current_depth == SkillDepth.CONCEPTUAL
+    assert sql_skill.confidence_score == 0.40
+
+    assert "docker-containers" in extracted_dict
+    docker_skill = extracted_dict["docker-containers"]
+    # No clues in local window should evaluate to APPLIED with 0.50 confidence
+    assert docker_skill.current_depth == SkillDepth.APPLIED
+    assert docker_skill.confidence_score == 0.50
+

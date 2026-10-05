@@ -118,10 +118,20 @@ APPLIED_CLUES = [
     r"\bshipped\b",
 ]
 
+CONCEPTUAL_CLUES = [
+    r"\bbasic\b",
+    r"\bfamiliar\b",
+    r"\bfamiliarity\b",
+    r"\bbeginner\b",
+    r"\belementary\b",
+    r"\blearning\b",
+    r"\bexposure\b",
+    r"\bintroductory\b",
+]
+
 
 class ResumeParser:
     """Extracts technical competency entities from resume text, assesses proficiency
-
     depth and confidence scores, and detects the user's best matching career role.
     """
 
@@ -148,7 +158,7 @@ class ResumeParser:
                     matches.extend(found)
 
             if matches:
-                # Assess depth and confidence based on context around matches
+                # Assess depth and confidence strictly from local context window around matches
                 depth, conf = self._evaluate_depth_and_confidence(matches, lower_text)
                 extracted_skills.append(
                     UserSkillState(
@@ -170,33 +180,33 @@ class ResumeParser:
     def _evaluate_depth_and_confidence(
         self, matches: List[re.Match], full_text: str
     ) -> tuple[SkillDepth, float]:
-        """Evaluates whether the candidate demonstrated architectural, applied, or conceptual depth."""
-        # Check context window (100 characters before and after matches)
+        """Evaluates whether the candidate demonstrated architectural, applied, or conceptual depth
+        strictly based on the local context window (±150 characters) around skill mentions.
+        """
         has_arch_clue = False
         has_applied_clue = False
+        has_conceptual_clue = False
 
         for match in matches:
-            start = max(0, match.start() - 100)
-            end = min(len(full_text), match.end() + 100)
+            start = max(0, match.start() - 150)
+            end = min(len(full_text), match.end() + 150)
             window = full_text[start:end]
 
             if any(re.search(pat, window, re.IGNORECASE) for pat in ARCHITECTURAL_CLUES):
                 has_arch_clue = True
             if any(re.search(pat, window, re.IGNORECASE) for pat in APPLIED_CLUES):
                 has_applied_clue = True
-
-        # Check full text as fallback
-        if not has_arch_clue and any(re.search(pat, full_text, re.IGNORECASE) for pat in ARCHITECTURAL_CLUES):
-            has_arch_clue = True
-        if not has_applied_clue and any(re.search(pat, full_text, re.IGNORECASE) for pat in APPLIED_CLUES):
-            has_applied_clue = True
+            if any(re.search(pat, window, re.IGNORECASE) for pat in CONCEPTUAL_CLUES):
+                has_conceptual_clue = True
 
         if has_arch_clue:
             return SkillDepth.ARCHITECTURAL, 0.85
         elif has_applied_clue:
             return SkillDepth.APPLIED, 0.80
+        elif has_conceptual_clue:
+            return SkillDepth.CONCEPTUAL, 0.40
         else:
-            return SkillDepth.CONCEPTUAL, 0.70
+            return SkillDepth.APPLIED, 0.50
 
     def _detect_role(self, lower_text: str, extracted_skills: set[str]) -> str:
         """Determines closest career role from text seniority keywords and skill coverage."""
