@@ -34,11 +34,13 @@ def test_curated_pilot_roadmap():
     assert any("PPL" in n.title or "Solo" in n.title for n in resp.nodes)
 
 def test_dynamic_arbitrary_profession_synthesis():
-    resp = roadmap_generator.generate_dynamic_roadmap("Quantum Cryptography Specialist", "beginner")
-    assert isinstance(resp, RoadmapResponse)
-    assert resp.profession == "Quantum Cryptography Specialist"
-    assert len(resp.stages) == 5
-    assert len(resp.nodes) >= 6
+    from unittest.mock import patch
+    with patch("app.roadmap_generator.generate_roadmap_with_groq", return_value=None):
+        resp = roadmap_generator.generate_dynamic_roadmap("Quantum Cryptography Specialist", "beginner")
+        assert isinstance(resp, RoadmapResponse)
+        assert resp.profession == "Quantum Cryptography Specialist"
+        assert len(resp.stages) == 5
+        assert len(resp.nodes) >= 6
 
     # Verify all stage node_ids exist
     node_ids = {n.id for n in resp.nodes}

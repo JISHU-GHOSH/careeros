@@ -138,14 +138,16 @@ def test_cors_headers_allowed():
 
 
 def test_generate_roadmap_endpoint():
-    payload = {"profession": "Robotics Engineer", "experience_level": "beginner"}
-    res = client.post("/api/roadmap/generate", json=payload)
-    assert res.status_code == 200
-    data = res.json()
-    assert data["profession"] == "Robotics Engineer"
-    assert len(data["stages"]) >= 4
-    assert len(data["nodes"]) >= 6
-    assert "salary_range" in data
+    from unittest.mock import patch
+    with patch("app.roadmap_generator.generate_roadmap_with_groq", return_value=None):
+        payload = {"profession": "Robotics Engineer", "experience_level": "beginner"}
+        res = client.post("/api/roadmap/generate", json=payload)
+        assert res.status_code == 200
+        data = res.json()
+        assert data["profession"] == "Robotics Engineer"
+        assert len(data["stages"]) >= 4
+        assert len(data["nodes"]) >= 6
+        assert "salary_range" in data
 
 
 def test_generate_roadmap_empty_error():

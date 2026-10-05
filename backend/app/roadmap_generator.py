@@ -1412,17 +1412,18 @@ class UniversalRoadmapGenerator:
         """Synthesizes an intelligent, structured roadmap for any career path."""
         norm_title = profession.strip().title()
 
-        # 0. Dynamic Groq Cloud LLM Generation (if configured or key provided)
-        groq_roadmap = generate_roadmap_with_groq(
-            profession=profession,
-            experience_level=experience_level,
-            api_key=api_key,
-        )
-        if groq_roadmap:
-            groq_roadmap.source = "groq"
-            return groq_roadmap
+        # If user explicitly passed an API key in the request, prioritize live Groq generation
+        if api_key and api_key.strip():
+            groq_roadmap = generate_roadmap_with_groq(
+                profession=profession,
+                experience_level=experience_level,
+                api_key=api_key,
+            )
+            if groq_roadmap:
+                groq_roadmap.source = "groq"
+                return groq_roadmap
 
-        # 1. Curated specific roadmap match
+        # 1. Curated specific roadmap match (instant 0ms latency, verified master curriculum)
         curated = self.find_curated_match(profession)
         if curated:
             return RoadmapResponse(
@@ -1435,6 +1436,16 @@ class UniversalRoadmapGenerator:
                 nodes=[RoadmapNode(**n) for n in curated["nodes"]],
                 source="curated",
             )
+
+        # 2. Dynamic Groq Cloud LLM Generation for unlisted/arbitrary professions
+        groq_roadmap = generate_roadmap_with_groq(
+            profession=profession,
+            experience_level=experience_level,
+            api_key=api_key,
+        )
+        if groq_roadmap:
+            groq_roadmap.source = "groq"
+            return groq_roadmap
 
         clean_slug = self.normalize_key(profession)
 

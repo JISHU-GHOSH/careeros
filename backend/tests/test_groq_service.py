@@ -21,8 +21,8 @@ def test_groq_status_endpoint():
     data = response.json()
     assert "groq_configured" in data
     assert "model" in data
-    assert data["model"] == "llama-3.3-70b-versatile"
-    assert "llama-3.3-70b-versatile" in data["supported_models"]
+    assert data["model"] in data["supported_models"]
+    assert len(data["supported_models"]) >= 2
 
 
 def test_effective_groq_key_precedence():

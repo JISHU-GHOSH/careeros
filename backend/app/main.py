@@ -206,9 +206,10 @@ class RoadmapStatusResponse(BaseModel):
 @app.get("/api/roadmap/status", response_model=RoadmapStatusResponse)
 def get_roadmap_status() -> RoadmapStatusResponse:
     """Returns AI status and Groq configuration state."""
+    from app.groq_service import PRIMARY_MODEL, SUPPORTED_MODELS
     return RoadmapStatusResponse(
         groq_configured=is_groq_configured(),
-        model="llama-3.3-70b-versatile",
-        supported_models=["llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
+        model=PRIMARY_MODEL,
+        supported_models=SUPPORTED_MODELS,
     )
 

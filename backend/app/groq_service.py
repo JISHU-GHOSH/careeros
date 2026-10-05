@@ -20,8 +20,14 @@ load_dotenv()
 logger = logging.getLogger("groq_service")
 
 # Default Groq model
-PRIMARY_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
-FALLBACK_MODEL = "llama-3.1-8b-instant"
+PRIMARY_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+SUPPORTED_MODELS = [
+    "openai/gpt-oss-120b",
+    "qwen/qwen3.8-27b",
+    "openai/gpt-oss-20b",
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+]
 
 
 def get_effective_groq_key(provided_key: Optional[str] = None) -> Optional[str]:
@@ -134,7 +140,7 @@ Output MUST be a valid JSON object with the following schema:
 }}
 """
 
-    models_to_try = [PRIMARY_MODEL, FALLBACK_MODEL]
+    models_to_try = list(dict.fromkeys([PRIMARY_MODEL] + SUPPORTED_MODELS))
     last_error: Optional[Exception] = None
 
     for model_name in models_to_try:
@@ -158,18 +164,40 @@ Output MUST be a valid JSON object with the following schema:
             data = json.loads(raw_content)
 
             # Validate and convert into RoadmapResponse
+            raw_stages = [RoadmapStage(**s) for s in data.get("stages", [])]
+            raw_nodes = [RoadmapNode(**n) for n in data.get("nodes", [])]
+
+            actual_node_ids = {n.id for n in raw_nodes}
+
+            # Reconcile node_ids per stage to eliminate nonexistent ghost node references
+            cleaned_stages: list[RoadmapStage] = []
+            for stage in raw_stages:
+                valid_nids = [nid for nid in stage.node_ids if nid in actual_node_ids]
+                # Associate nodes that belong to this stage_index
+                for n in raw_nodes:
+                    if n.stage_index == stage.stage_index and n.id not in valid_nids:
+                        valid_nids.append(n.id)
+                stage.node_ids = valid_nids
+                cleaned_stages.append(stage)
+
+            # Reconcile prerequisites so all point to valid existing nodes
+            cleaned_nodes: list[RoadmapNode] = []
+            for n in raw_nodes:
+                n.prerequisites = [p for p in n.prerequisites if p in actual_node_ids and p != n.id]
+                cleaned_nodes.append(n)
+
             roadmap = RoadmapResponse(
                 profession=data.get("profession", profession.title()),
                 experience_level=data.get("experience_level", experience_level),
                 summary=data.get("summary", f"Structured career roadmap for {profession}."),
                 salary_range=data.get("salary_range", "$70,000 - $140,000 / year"),
                 estimated_months=int(data.get("estimated_months", 6)),
-                stages=[RoadmapStage(**s) for s in data.get("stages", [])],
-                nodes=[RoadmapNode(**n) for n in data.get("nodes", [])],
+                stages=cleaned_stages,
+                nodes=cleaned_nodes,
             )
 
-            # Ensure valid node count
-            if len(roadmap.nodes) >= 5 and len(roadmap.stages) >= 3:
+            # Ensure valid node count (at least 6 nodes, at least 4 stages)
+            if len(roadmap.nodes) >= 6 and len(roadmap.stages) >= 4:
                 logger.info(f"Successfully generated Groq roadmap with {len(roadmap.nodes)} nodes via {model_name}")
                 return roadmap
 
