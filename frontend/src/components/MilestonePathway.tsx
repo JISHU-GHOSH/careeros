@@ -29,6 +29,8 @@ export interface MilestonePathwayProps {
   onSelectMilestone?: (index: number) => void;
   onToggleTask?: (taskId: string) => void;
   className?: string;
+  targetRoleTitle?: string;
+  onCompleteMilestone?: () => void;
 }
 
 export function MilestonePathway({
@@ -37,6 +39,8 @@ export function MilestonePathway({
   onSelectMilestone,
   onToggleTask,
   className,
+  targetRoleTitle,
+  onCompleteMilestone,
 }: MilestonePathwayProps) {
   const {
     pathways: contextPathways,
@@ -149,11 +153,11 @@ export function MilestonePathway({
               <Compass className="w-4 h-4" />
             </div>
             <h2 className="text-lg md:text-xl font-bold tracking-tight text-foreground">
-              Milestone Acceleration Pathway
+              Your Weekly Action Plan
             </h2>
           </div>
-          <p className="text-xs md:text-sm text-muted-foreground mt-1">
-            Topologically sequenced weekly roadmap calibrated to accelerate senior role readiness.
+          <p className="text-xs md:text-sm text-slate-500 mt-1">
+            Bite-sized articles, hands-on mini-projects, and 1-on-1 mentor guidance.
           </p>
         </div>
 

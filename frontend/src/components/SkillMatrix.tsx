@@ -296,11 +296,11 @@ export function SkillMatrix({
               <SlidersHorizontal className="w-4 h-4" />
             </div>
             <h2 className="text-lg md:text-xl font-bold tracking-tight text-foreground">
-              Skill-Gap Diagnostic Matrix
+              Your Skills Checklist
             </h2>
           </div>
-          <p className="text-xs md:text-sm text-muted-foreground mt-1">
-            Real-time competency analysis calibrated against role requirements, market demand, and depth benchmarks.
+          <p className="text-xs md:text-sm text-slate-500 mt-1">
+            See your validated skills, areas to polish, and the next key competencies to learn.
           </p>
         </div>
 

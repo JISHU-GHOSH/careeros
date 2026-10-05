@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CareerOS — Intelligent Career Navigation & Skill Gap Diagnostics",
+  title: "CareerOS — Your Personal Career GPS & Skill Growth Hub",
   description:
-    "Dynamic graph-based competency mapping, confidence-weighted skill-gap diagnostics, and milestone learning acceleration.",
+    "Interactive career trajectory mapping, personalized skill-gap diagnostics, and milestone learning pathways.",
 };
 
 export default function RootLayout({
@@ -13,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 selection:text-primary-foreground">
+    <html lang="en">
+      <body className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20 selection:text-primary antialiased">
         {children}
       </body>
     </html>

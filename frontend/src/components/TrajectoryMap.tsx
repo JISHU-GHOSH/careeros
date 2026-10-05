@@ -267,31 +267,31 @@ export function TrajectoryMap({
               <Compass className="w-4 h-4" />
             </div>
             <h2 className="text-lg md:text-xl font-bold tracking-tight text-foreground">
-              Career Trajectory Map
+              Your Career Roadmap
             </h2>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-secondary text-muted-foreground font-medium border border-border/60 hidden sm:inline-flex items-center gap-1">
-              <GitBranch className="w-3 h-3" />
-              NetworkX DAG
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-medium border border-indigo-200/80 hidden sm:inline-flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-indigo-500" />
+              Interactive Roadmap ✨
             </span>
           </div>
-          <p className="text-xs md:text-sm text-muted-foreground mt-1">
-            Interactive node-based progression engine. Click any role node to inspect requirements or switch target.
+          <p className="text-xs md:text-sm text-slate-500 mt-1">
+            Click any career stage below to view its skills, project challenges, and promotion requirements.
           </p>
         </div>
 
         {/* Legend pills */}
         <div className="flex flex-wrap items-center gap-2 text-[11px]">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            <CheckCircle2 className="w-3 h-3" /> Completed
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">
+            <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Completed
           </span>
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/30">
-            <Radio className="w-3 h-3 animate-pulse" /> Active Role
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 font-medium">
+            <Radio className="w-3 h-3 text-indigo-600 animate-pulse" /> You Are Here
           </span>
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/30">
-            <Target className="w-3 h-3" /> Target Role
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 font-medium">
+            <Target className="w-3 h-3 text-amber-600" /> Target Goal
           </span>
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-secondary text-muted-foreground border border-border/60">
-            <Sparkles className="w-3 h-3" /> Horizon
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-50 text-slate-600 border border-slate-200 font-medium">
+            <Sparkles className="w-3 h-3 text-slate-400" /> Next Horizon
           </span>
         </div>
       </div>
@@ -343,22 +343,22 @@ export function TrajectoryMap({
                       "focus:outline-none focus:ring-2 focus:ring-primary/50",
                       // State-specific borders & styling
                       state === "completed" && [
-                        "border-emerald-500/40 bg-emerald-950/10 hover:border-emerald-500/60",
-                        "hover:bg-emerald-950/20",
+                        "border-emerald-200 bg-emerald-50/90 text-emerald-950 hover:border-emerald-300",
+                        "hover:bg-emerald-100/50 shadow-xs",
                       ],
                       state === "active" && [
-                        "border-blue-500/80 bg-blue-950/20 shadow-md shadow-blue-500/10",
-                        "hover:border-blue-400 hover:bg-blue-950/30",
+                        "border-indigo-300 bg-indigo-50/90 text-indigo-950 shadow-sm shadow-indigo-100 ring-2 ring-indigo-400/20",
+                        "hover:border-indigo-400 hover:bg-indigo-100/50",
                       ],
                       state === "target" && [
-                        "border-amber-500/80 bg-amber-950/20 shadow-md shadow-amber-500/10",
-                        "hover:border-amber-400 hover:bg-amber-950/30",
+                        "border-amber-300 bg-amber-50/90 text-amber-950 shadow-sm shadow-amber-100 ring-2 ring-amber-400/20",
+                        "hover:border-amber-400 hover:bg-amber-100/50",
                       ],
                       state === "horizon" && [
-                        "border-border/60 border-dashed bg-secondary/30 hover:border-border hover:bg-secondary/50",
+                        "border-slate-200 border-dashed bg-slate-50/80 text-slate-700 hover:border-slate-300 hover:bg-slate-100/60",
                       ],
                       state === "lateral" && [
-                        "border-border bg-card hover:border-primary/50",
+                        "border-purple-200 bg-purple-50/70 text-purple-950 hover:border-purple-300 hover:bg-purple-100/50",
                       ],
                       isInspected && "ring-2 ring-primary/80 ring-offset-2 ring-offset-background"
                     )}

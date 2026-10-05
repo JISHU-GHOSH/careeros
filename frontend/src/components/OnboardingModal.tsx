@@ -38,6 +38,8 @@ export interface OnboardingModalProps {
   onComplete?: () => void;
   className?: string;
   defaultStep?: number;
+  initialCurrentRoleId?: string;
+  initialTargetRoleId?: string;
 }
 
 export type TransitionMode = "fast_track" | "lateral_pivot";
@@ -150,6 +152,8 @@ export function OnboardingModal({
   onComplete,
   className,
   defaultStep = 1,
+  initialCurrentRoleId,
+  initialTargetRoleId,
 }: OnboardingModalProps) {
   const {
     roles,
@@ -170,14 +174,14 @@ export function OnboardingModal({
   // Step 1 State: Starting Role & Resume Parsing
   const [startIntakeMode, setStartIntakeMode] = useState<"resume" | "manual">("resume");
   const [selectedCurrentRole, setSelectedCurrentRole] = useState<string>(
-    contextCurrentRole || "mid-fullstack"
+    initialCurrentRoleId || contextCurrentRole || "mid-fullstack"
   );
   const [selectedExperience, setSelectedExperience] = useState<string>("mid");
   const [resumeParsedData, setResumeParsedData] = useState<ResumeParseResponse | null>(null);
 
   // Step 2 State: Target Role & Transition Mode
   const [selectedTargetRole, setSelectedTargetRole] = useState<string>(
-    contextTargetRole || "senior-fullstack"
+    initialTargetRoleId || contextTargetRole || "senior-fullstack"
   );
   const [transitionMode, setTransitionMode] = useState<TransitionMode>("fast_track");
   const [targetVelocity, setTargetVelocity] = useState<"sprint" | "balanced" | "part_time">(

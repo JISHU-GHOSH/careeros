@@ -5,17 +5,19 @@ import {
   Compass,
   Sparkles,
   Target,
-  Layers,
   ArrowRight,
   TrendingUp,
   Zap,
   Shield,
-  FileText,
   Sliders,
   CheckCircle2,
   AlertCircle,
   Clock,
   Award,
+  HeartHandshake,
+  Flame,
+  ChevronRight,
+  Smile,
 } from "lucide-react";
 import { CareerProvider, useCareerSafe } from "@/context/CareerContext";
 import {
@@ -98,141 +100,147 @@ function DashboardView() {
 
       {/* Main Dashboard Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
-        {/* 2. Welcome & Trajectory Acceleration Hero Banner */}
-        <div className="relative rounded-2xl border border-border/80 bg-gradient-to-br from-card via-card/90 to-primary/5 p-6 sm:p-8 shadow-sm overflow-hidden">
-          {/* Subtle background ambient light */}
+        
+        {/* 2. Inspiring, Welcoming Hero Banner */}
+        <div className="relative rounded-3xl border border-indigo-100 bg-gradient-to-br from-white via-indigo-50/40 to-purple-50/30 p-6 sm:p-9 shadow-sm shadow-indigo-100/50 overflow-hidden">
+          {/* Soft ambient background orbs */}
           <div
-            className="pointer-events-none absolute -top-24 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"
+            className="pointer-events-none absolute -top-20 -right-20 w-80 h-80 bg-indigo-200/30 rounded-full blur-3xl"
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute -bottom-20 -left-20 w-80 h-80 bg-amber-200/25 rounded-full blur-3xl"
             aria-hidden="true"
           />
 
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-            <div className="space-y-3 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-semibold uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Autonomous Trajectory Engine</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="space-y-3.5 max-w-2xl">
+              {/* Friendly pill badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-indigo-200/80 bg-white/80 shadow-xs text-indigo-700 text-xs font-semibold backdrop-blur-xs">
+                <Sparkles className="w-4 h-4 text-amber-500 animate-bounce" />
+                <span>Your Career GPS is Active</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
 
               <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
-                  Welcome back, Alex Chen
+                <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                  Welcome back, Alex! 👋
                 </h1>
-                <p className="text-sm sm:text-base text-muted-foreground mt-1">
-                  Navigating from{" "}
-                  <strong className="text-foreground">{currentRole?.title}</strong> to{" "}
-                  <strong className="text-primary">{targetRole?.title}</strong> with confidence-weighted competency diagnostics.
+                <p className="text-sm sm:text-base text-slate-600 mt-1.5 leading-relaxed">
+                  You are making great progress towards becoming a{" "}
+                  <span className="font-semibold text-indigo-600 px-1.5 py-0.5 rounded-md bg-indigo-50 border border-indigo-100">
+                    {targetRole?.title}
+                  </span>
+                  . Here is your customized growth plan for this week.
                 </p>
               </div>
 
-              {/* Active Trajectory Path Strip */}
+              {/* Trajectory Step Pills */}
               <div className="flex flex-wrap items-center gap-2.5 pt-1 text-xs">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-secondary/80 border border-border/80">
-                  <span className="text-muted-foreground">Current:</span>
-                  <span className="font-semibold text-foreground">{currentRole?.title}</span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200/80 text-slate-700 shadow-2xs font-medium">
+                  <span className="text-slate-400">Current:</span>
+                  <span>{currentRole?.title}</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-primary shrink-0" />
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary/15 border border-primary/30 text-primary font-semibold">
+                <ArrowRight className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-semibold shadow-xs">
                   <span>Target:</span>
                   <span>{targetRole?.title}</span>
                 </div>
-                <div className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-secondary/60 border border-border/60 text-muted-foreground text-[11px] font-mono">
-                  <Clock className="w-3.5 h-3.5 text-primary" />
-                  <span>~{estimatedTimeline} Months Window</span>
+                <div className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200/60 text-amber-800 text-xs font-medium">
+                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Est. ~{estimatedTimeline} Months to Goal</span>
                 </div>
               </div>
             </div>
 
-            {/* Quick Action: 60-Second Onboarding & Recalibration Trigger */}
+            {/* Inspiring Action Card */}
             <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-3 shrink-0">
               <button
                 type="button"
                 onClick={() => setIsOnboardingOpen(true)}
                 className={cn(
-                  "px-5 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-md transition-all duration-200",
-                  "bg-gradient-to-r from-primary via-indigo-600 to-primary hover:opacity-95 text-primary-foreground",
-                  "flex items-center justify-center gap-2.5 group active:scale-95 ring-1 ring-primary/40"
+                  "px-6 py-3.5 rounded-2xl font-bold text-sm shadow-md transition-all duration-200",
+                  "bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:shadow-indigo-200 hover:-translate-y-0.5 text-white",
+                  "flex items-center justify-center gap-2.5 group active:scale-98"
                 )}
               >
                 <Sliders className="w-4 h-4 text-amber-300 group-hover:rotate-45 transition-transform" />
-                <span>60-Sec Onboarding Wizard</span>
+                <span>Personalize My Plan (60s)</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => {
-                  recalibrateDiagnostics();
-                }}
+                onClick={() => recalibrateDiagnostics()}
                 disabled={isSyncing}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-secondary/80 hover:bg-secondary text-foreground border border-border/80 transition-colors flex items-center justify-center gap-2"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-white/80 hover:bg-white text-slate-700 border border-slate-200/80 shadow-2xs hover:shadow-xs transition-all flex items-center justify-center gap-2"
               >
-                <Sparkles className="w-3.5 h-3.5 text-primary" />
-                <span>Recalibrate Diagnostics</span>
+                <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                <span>{isSyncing ? "Updating..." : "Refresh Skill Matches"}</span>
               </button>
             </div>
           </div>
 
-          {/* Quick Metrics Cards Strip */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-6 mt-6 border-t border-border/40">
-            {/* Readiness */}
-            <div className="p-3.5 rounded-xl bg-secondary/30 border border-border/60 space-y-1">
-              <span className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground flex items-center justify-between">
-                <span>Readiness</span>
-                <Target className="w-3.5 h-3.5 text-amber-400" />
+          {/* Encouraging Milestone Stat Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 pt-6 mt-6 border-t border-slate-200/60">
+            {/* Card 1: Readiness */}
+            <div className="p-4 rounded-2xl bg-white/90 border border-indigo-100/80 shadow-xs space-y-1 hover:border-indigo-200 transition-colors">
+              <span className="text-xs uppercase tracking-wider font-semibold text-slate-500 flex items-center justify-between">
+                <span>Role Match</span>
+                <Target className="w-4 h-4 text-indigo-500" />
               </span>
-              <p className="text-xl sm:text-2xl font-extrabold font-mono text-foreground">
+              <p className="text-2xl sm:text-3xl font-extrabold text-indigo-600">
                 {readinessScore}%
               </p>
-              <p className="text-[10px] text-muted-foreground">
-                Weighted against target requirements
+              <p className="text-[11px] text-slate-500 font-medium">
+                🎯 Over half-way to Senior ready!
               </p>
             </div>
 
-            {/* Missing Gaps */}
-            <div className="p-3.5 rounded-xl bg-secondary/30 border border-border/60 space-y-1">
-              <span className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground flex items-center justify-between">
-                <span>Priority Gaps</span>
-                <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
+            {/* Card 2: Priority Skills */}
+            <div className="p-4 rounded-2xl bg-white/90 border border-rose-100/80 shadow-xs space-y-1 hover:border-rose-200 transition-colors">
+              <span className="text-xs uppercase tracking-wider font-semibold text-slate-500 flex items-center justify-between">
+                <span>Skills to Unlock</span>
+                <Flame className="w-4 h-4 text-rose-500" />
               </span>
-              <p className="text-xl sm:text-2xl font-extrabold font-mono text-rose-400">
-                {missingGapsCount} Core
+              <p className="text-2xl sm:text-3xl font-extrabold text-rose-600">
+                {missingGapsCount} Key Gaps
               </p>
-              <p className="text-[10px] text-muted-foreground">
-                +{needsPolishCount} competencies needing polish
+              <p className="text-[11px] text-slate-500 font-medium">
+                🚀 Just 2 high-impact skills left
               </p>
             </div>
 
-            {/* Milestone Progress */}
-            <div className="p-3.5 rounded-xl bg-secondary/30 border border-border/60 space-y-1">
-              <span className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground flex items-center justify-between">
-                <span>Milestone Tasks</span>
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+            {/* Card 3: Completed Steps */}
+            <div className="p-4 rounded-2xl bg-white/90 border border-emerald-100/80 shadow-xs space-y-1 hover:border-emerald-200 transition-colors">
+              <span className="text-xs uppercase tracking-wider font-semibold text-slate-500 flex items-center justify-between">
+                <span>Tasks Done</span>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
               </span>
-              <p className="text-xl sm:text-2xl font-extrabold font-mono text-emerald-400">
-                {completedTasksCount} / {allTasks.length} Done
+              <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600">
+                {completedTasksCount} / {allTasks.length || 2}
               </p>
-              <p className="text-[10px] text-muted-foreground">
-                0ms optimistic XP checkoff
+              <p className="text-[11px] text-slate-500 font-medium">
+                ⚡ Instant XP on completion
               </p>
             </div>
 
-            {/* Trajectory Velocity */}
-            <div className="p-3.5 rounded-xl bg-secondary/30 border border-border/60 space-y-1">
-              <span className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground flex items-center justify-between">
-                <span>Experience & Streak</span>
-                <Zap className="w-3.5 h-3.5 text-amber-400" />
+            {/* Card 4: Streak & XP */}
+            <div className="p-4 rounded-2xl bg-white/90 border border-amber-100/80 shadow-xs space-y-1 hover:border-amber-200 transition-colors">
+              <span className="text-xs uppercase tracking-wider font-semibold text-slate-500 flex items-center justify-between">
+                <span>Momentum</span>
+                <Zap className="w-4 h-4 text-amber-500" />
               </span>
-              <p className="text-xl sm:text-2xl font-extrabold font-mono text-amber-400">
+              <p className="text-2xl sm:text-3xl font-extrabold text-amber-600">
                 {xp.toLocaleString()} XP
               </p>
-              <p className="text-[10px] text-muted-foreground">
-                Level {level} • {streak} Day Streak
+              <p className="text-[11px] text-slate-500 font-medium">
+                🔥 {streak} Day Streak • Level {level}
               </p>
             </div>
           </div>
         </div>
 
-        {/* 3. Trajectory Map Component (NetworkX Live Graph Visualization) */}
+        {/* 3. Trajectory Map Component (Interactive Career Roadmap) */}
         <section aria-labelledby="trajectory-section-title">
           <TrajectoryMap
             roles={roles}
@@ -246,61 +254,65 @@ function DashboardView() {
           />
         </section>
 
-        {/* 4. Two-Column Intelligence Grid: Skill Matrix + Milestone Acceleration */}
+        {/* 4. Two-Column Layout: Skill Checklist + Active Weekly Action Plan */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Skill Matrix (7 Cols on desktop) */}
-          <section
-            className="lg:col-span-7 space-y-6"
-            aria-labelledby="skill-matrix-section-title"
-          >
+          {/* Left Column: Skill Matrix (5 cols) */}
+          <div className="lg:col-span-5 w-full">
             <SkillMatrix
               report={diagnosticReport}
-              onRecalibrate={recalibrateDiagnostics}
+              onRecalibrate={() => setIsOnboardingOpen(true)}
             />
-          </section>
+          </div>
 
-          {/* Right Column: Milestone Pathway & Peer Mentor (5 Cols on desktop) */}
-          <section
-            className="lg:col-span-5 space-y-6"
-            aria-labelledby="milestone-pathway-section-title"
-          >
+          {/* Right Column: Milestone Pathway & Action Checklist (7 cols) */}
+          <div className="lg:col-span-7 w-full">
             <MilestonePathway
               pathways={pathways}
+              targetRoleTitle={targetRole?.title}
+              onCompleteMilestone={() => {
+                recalibrateDiagnostics();
+              }}
             />
-          </section>
+          </div>
+        </div>
+
+        {/* 5. Encouraging Community & Privacy Footer Banner */}
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm shrink-0">
+              🛡️
+            </div>
+            <div>
+              <p className="font-semibold text-slate-900">
+                100% Private & Stealth-Protected
+              </p>
+              <p className="text-slate-500">
+                Your current employer cannot see your learning progress or career trajectory exploration.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => setIsOnboardingOpen(true)}
+              className="text-indigo-600 hover:text-indigo-700 font-semibold underline"
+            >
+              Update Career Goal
+            </button>
+            <span className="text-slate-300">•</span>
+            <span className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 font-medium border border-emerald-100">
+              Stealth Mode Active
+            </span>
+          </div>
         </div>
       </main>
 
-      {/* 5. Footer */}
-      <footer className="mt-16 border-t border-border/60 bg-secondary/20 py-8 px-4 text-center text-xs text-muted-foreground">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Compass className="w-4 h-4 text-primary" />
-            <span className="font-semibold text-foreground">CareerOS Platform</span>
-            <span>•</span>
-            <span>Graph-Based Engineering Trajectory & Skill Diagnostics</span>
-          </div>
-
-          <div className="flex items-center gap-4 text-[11px]">
-            <span className="inline-flex items-center gap-1 text-emerald-400 font-mono">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              0ms Optimistic Engine Active
-            </span>
-            <span>•</span>
-            <span className="font-mono">
-              Privacy: {stealthMode ? "Stealth Mode Protected" : "Public"}
-            </span>
-          </div>
-        </div>
-      </footer>
-
-      {/* 6. Progressive 60-Second Onboarding & Resume Upload Wizard Modal */}
+      {/* 6. 60-Second Onboarding Wizard Modal */}
       <OnboardingModal
         isOpen={isOnboardingOpen}
         onClose={() => setIsOnboardingOpen(false)}
-        onComplete={() => {
-          setIsOnboardingOpen(false);
-        }}
+        initialCurrentRoleId={currentRoleId}
+        initialTargetRoleId={targetRoleId}
       />
     </div>
   );
@@ -308,13 +320,7 @@ function DashboardView() {
 
 export default function HomePage() {
   return (
-    <CareerProvider
-      initialCurrentRoleId="mid-fullstack"
-      initialTargetRoleId="senior-fullstack"
-      initialXp={1450}
-      initialStreak={5}
-      initialStealthMode={true}
-    >
+    <CareerProvider>
       <DashboardView />
     </CareerProvider>
   );

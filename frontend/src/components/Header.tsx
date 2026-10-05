@@ -108,7 +108,7 @@ export function Header({
                 </span>
               </span>
               <span className="text-[10px] text-muted-foreground hidden sm:block -mt-1 font-medium">
-                Autonomous Trajectory Engine
+                Your Personal Career GPS ✨
               </span>
             </div>
           </a>

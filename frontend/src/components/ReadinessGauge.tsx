@@ -42,8 +42,8 @@ export function ReadinessGauge({
   const getReadinessTier = (pct: number) => {
     if (pct >= 80) {
       return {
-        label: "Market Ready",
-        badgeBg: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+        label: "Ready to Apply! 🎉",
+        badgeBg: "bg-emerald-50 text-emerald-700 border-emerald-200",
         barGradient: "from-emerald-500 to-teal-400",
         description: "Competencies verified across core architectural domains.",
         icon: CheckCircle2,
@@ -51,26 +51,26 @@ export function ReadinessGauge({
     }
     if (pct >= 60) {
       return {
-        label: "Accelerating",
-        badgeBg: "bg-blue-500/15 text-blue-400 border-blue-500/30",
-        barGradient: "from-blue-600 via-indigo-500 to-emerald-400",
+        label: "Almost There! 🚀",
+        badgeBg: "bg-indigo-50 text-indigo-700 border-indigo-200",
+        barGradient: "from-indigo-600 via-indigo-500 to-emerald-400",
         description: "On track with primary must-have requirements in progress.",
         icon: TrendingUp,
       };
     }
     if (pct >= 40) {
       return {
-        label: "Bridging Gaps",
-        badgeBg: "bg-amber-500/15 text-amber-400 border-amber-500/30",
-        barGradient: "from-amber-500 via-yellow-500 to-blue-500",
+        label: "Building Momentum ✨",
+        badgeBg: "bg-amber-50 text-amber-800 border-amber-200",
+        barGradient: "from-amber-500 via-yellow-500 to-indigo-500",
         description: "Foundational applied competencies acquired; deepening architectural depth.",
         icon: Sparkles,
       };
     }
     return {
-      label: "Foundation Phase",
-      badgeBg: "bg-rose-500/15 text-rose-400 border-rose-500/30",
-      barGradient: "from-rose-500 via-amber-500 to-blue-500",
+      label: "Getting Started 🌱",
+      badgeBg: "bg-rose-50 text-rose-700 border-rose-200",
+      barGradient: "from-rose-500 via-amber-500 to-indigo-500",
       description: "Initial calibration active. Prioritizing baseline prerequisites.",
       icon: AlertCircle,
     };
