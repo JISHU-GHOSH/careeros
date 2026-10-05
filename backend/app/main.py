@@ -1,3 +1,4 @@
+import os
 from typing import List, Optional, Dict, Any, Union
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,10 +24,8 @@ app = FastAPI(
 )
 
 # Configure Cross-Origin Resource Sharing (CORS)
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
+cors_env = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
+origins = [origin.strip() for origin in cors_env.split(",") if origin.strip()]
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,7 +1,15 @@
 import pytest
 from app.graph import CareerGraphEngine
 from app.diagnostics import DiagnosticsEngine
-from app.models import UserSkillState, SkillDepth, RoleRoiRecommendation, DiagnosticReport
+from app.models import (
+    UserSkillState,
+    SkillDepth,
+    RoleRoiRecommendation,
+    DiagnosticReport,
+    Role,
+    RoleSkillRequirement,
+    SkillImportance,
+)
 
 
 def test_compute_diagnostic_report():
@@ -121,3 +129,24 @@ def test_simulate_reverse_roi_excludes_current_role():
     recommendations = diag.simulate_reverse_roi(user_skills, current_role_id="junior-frontend")
     rec_role_ids = [r.role_id for r in recommendations]
     assert "junior-frontend" not in rec_role_ids
+
+
+def test_simulate_reverse_roi_with_absent_skill_in_role():
+    from app.seed_data import SEED_ROLES
+    custom_role = Role(
+        id="custom-role",
+        title="Custom Test Role",
+        domain="Engineering",
+        seniority_level=1,
+        requirements=[
+            RoleSkillRequirement(skill_id="javascript-typescript", required_depth=SkillDepth.APPLIED, importance=SkillImportance.MUST_HAVE),
+            RoleSkillRequirement(skill_id="non-existent-skill-id", required_depth=SkillDepth.APPLIED, importance=SkillImportance.NICE_TO_HAVE),
+        ],
+    )
+    graph_engine = CareerGraphEngine(roles=list(SEED_ROLES) + [custom_role])
+    diag = DiagnosticsEngine(graph_engine)
+    recs = diag.simulate_reverse_roi(["javascript-typescript"])
+    custom_rec = next((r for r in recs if r.role_id == "custom-role"), None)
+    assert custom_rec is not None
+
+

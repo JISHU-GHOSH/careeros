@@ -161,12 +161,13 @@ class DiagnosticsEngine:
             top_missing = (missing_ids + polish_ids)[:3]
 
             # Average market demand of role requirements
-            if role.requirements:
-                avg_demand = sum(
-                    self.graph_engine.get_skill_by_id(r.skill_id).market_demand_percent
-                    for r in role.requirements
-                    if self.graph_engine.get_skill_by_id(r.skill_id) is not None
-                ) / len(role.requirements)
+            valid_skills = [
+                skill
+                for r in role.requirements
+                if (skill := self.graph_engine.get_skill_by_id(r.skill_id)) is not None
+            ]
+            if valid_skills:
+                avg_demand = sum(s.market_demand_percent for s in valid_skills) / len(valid_skills)
             else:
                 avg_demand = 50.0
 

@@ -581,7 +581,7 @@ export function CareerProvider({
    * Optimistic task toggle engine:
    * 1. Functional updater for pathways preventing stale closure overwrites on rapid clicks.
    * 2. Instant XP delta addition/subtraction.
-   * 3. Pure computation and application of user skills and weighted readiness.
+   * 3. Functional state derivation of user skills and weighted readiness.
    * 4. Asynchronous background sync completely outside of any setState updater.
    */
   const toggleTask = useCallback(
@@ -632,61 +632,67 @@ export function CareerProvider({
       const allCompleted =
         completedFocusTasks === allFocusTasks.length && allFocusTasks.length > 0;
 
-      // 2. Pure computation of updated skills list
-      const existingIdx = userSkills.findIndex((s) => s.skill_id === targetSkillId);
-      let updatedSkillsList: UserSkillState[];
+      // 2. Functional derivation of updated skills list ensuring atomic transitions on rapid clicks
+      let updatedSkillsList: UserSkillState[] = userSkills;
 
-      if (existingIdx >= 0) {
-        const current = userSkills[existingIdx];
-        const newDepth = allCompleted
-          ? SkillDepth.APPLIED
-          : completedFocusTasks > 0
-          ? Math.max(current.current_depth, SkillDepth.CONCEPTUAL)
-          : current.current_depth;
+      setUserSkills((prevSkills) => {
+        const existingIdx = prevSkills.findIndex((s) => s.skill_id === targetSkillId);
+        let updated: UserSkillState[];
 
-        const newConfidence = allCompleted
-          ? 0.95
-          : completedFocusTasks > 0
-          ? Math.min(0.9, Math.max(0.65, current.confidence_score + 0.15))
-          : Math.max(0.4, current.confidence_score - 0.15);
+        if (existingIdx >= 0) {
+          const current = prevSkills[existingIdx];
+          const newDepth = allCompleted
+            ? SkillDepth.APPLIED
+            : completedFocusTasks > 0
+            ? Math.max(current.current_depth, SkillDepth.CONCEPTUAL)
+            : current.current_depth;
 
-        const newSource = allCompleted ? "ARTIFACT_VERIFIED" : current.verification_source;
+          const newConfidence = allCompleted
+            ? 0.95
+            : completedFocusTasks > 0
+            ? Math.min(0.9, Math.max(0.65, current.confidence_score + 0.15))
+            : Math.max(0.4, current.confidence_score - 0.15);
 
-        updatedSkillsList = [
-          ...userSkills.slice(0, existingIdx),
-          {
-            ...current,
-            current_depth: newDepth,
-            confidence_score: newConfidence,
-            verification_source: newSource,
-          },
-          ...userSkills.slice(existingIdx + 1),
-        ];
-      } else {
-        // New skill acquired through practical project completion
-        updatedSkillsList = [
-          ...userSkills,
-          {
-            skill_id: targetSkillId,
-            current_depth: allCompleted ? SkillDepth.APPLIED : SkillDepth.CONCEPTUAL,
-            confidence_score: allCompleted ? 0.95 : 0.7,
-            verification_source: "ARTIFACT_VERIFIED",
-          },
-        ];
-      }
+          const newSource = allCompleted ? "ARTIFACT_VERIFIED" : current.verification_source;
+
+          updated = [
+            ...prevSkills.slice(0, existingIdx),
+            {
+              ...current,
+              current_depth: newDepth,
+              confidence_score: newConfidence,
+              verification_source: newSource,
+            },
+            ...prevSkills.slice(existingIdx + 1),
+          ];
+        } else {
+          // New skill acquired through practical project completion
+          updated = [
+            ...prevSkills,
+            {
+              skill_id: targetSkillId,
+              current_depth: allCompleted ? SkillDepth.APPLIED : SkillDepth.CONCEPTUAL,
+              confidence_score: allCompleted ? 0.95 : 0.7,
+              verification_source: "ARTIFACT_VERIFIED",
+            },
+          ];
+        }
+
+        updatedSkillsList = updated;
+        return updated;
+      });
 
       // 3. Instant optimistic state updates
       setXp((prev) => Math.max(0, prev + deltaXp));
-      setUserSkills(updatedSkillsList);
 
-      const instantReadiness = calculateWeightedReadiness(updatedSkillsList, targetRole);
-      setReadinessScore(instantReadiness);
+      const newReadiness = calculateWeightedReadiness(updatedSkillsList, targetRole);
+      setReadinessScore(newReadiness);
 
       setDiagnosticReport((prevReport) => {
         if (!prevReport) return null;
         return {
           ...prevReport,
-          readiness_percentage: instantReadiness,
+          readiness_percentage: newReadiness,
         };
       });
 
