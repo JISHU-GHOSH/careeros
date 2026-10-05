@@ -30,6 +30,13 @@ const getBaseUrl = (): string => {
   if (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
   }
+  // When running on Vercel or any deployed domain, use same-origin relative URLs
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    if (host !== "localhost" && host !== "127.0.0.1") {
+      return "";
+    }
+  }
   return "http://127.0.0.1:8000";
 };
 
