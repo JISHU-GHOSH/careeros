@@ -137,3 +137,42 @@ export interface ResumeParseResponse {
   detected_role: string;
   extracted_skills: UserSkillState[];
 }
+
+export type RoadmapNodeCategory = "essential" | "recommended" | "specialization";
+export type RoadmapNodeStatus = "to_learn" | "in_progress" | "mastered";
+
+export interface RoadmapNode {
+  id: string;
+  title: string;
+  stage_index: number;
+  category: RoadmapNodeCategory;
+  description: string;
+  key_skills: string[];
+  project_challenge: string;
+  resources: string[];
+  prerequisites: string[];
+  status?: RoadmapNodeStatus;
+}
+
+export interface RoadmapStage {
+  stage_index: number;
+  title: string;
+  estimated_weeks: number;
+  node_ids: string[];
+}
+
+export interface RoadmapResponse {
+  profession: string;
+  experience_level: string;
+  summary: string;
+  salary_range: string;
+  estimated_months: number;
+  stages: RoadmapStage[];
+  nodes: RoadmapNode[];
+}
+
+export interface RoadmapGenerateRequest {
+  profession: string;
+  experience_level?: "beginner" | "intermediate" | "career_switcher";
+}
+

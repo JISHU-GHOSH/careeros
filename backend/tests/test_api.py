@@ -135,3 +135,28 @@ def test_cors_headers_allowed():
     )
     assert res.status_code == 200
     assert res.headers.get("access-control-allow-origin") == "http://localhost:3000"
+
+
+def test_generate_roadmap_endpoint():
+    payload = {"profession": "Robotics Engineer", "experience_level": "beginner"}
+    res = client.post("/api/roadmap/generate", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["profession"] == "Robotics Engineer"
+    assert len(data["stages"]) >= 4
+    assert len(data["nodes"]) >= 6
+    assert "salary_range" in data
+
+
+def test_generate_roadmap_empty_error():
+    res = client.post("/api/roadmap/generate", json={"profession": ""})
+    assert res.status_code == 400
+
+
+def test_roadmap_suggestions_endpoint():
+    res = client.get("/api/roadmap/suggestions")
+    assert res.status_code == 200
+    data = res.json()
+    assert isinstance(data, list)
+    assert len(data) >= 5
+    assert "Game Developer" in data

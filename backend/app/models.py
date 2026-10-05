@@ -67,3 +67,41 @@ class RoleRoiRecommendation(BaseModel):
     match_percentage: int
     salary_boost_estimate: str
     top_missing_skills: List[str]
+
+
+# ==========================================
+# Universal Profession Roadmap Schemas
+# ==========================================
+
+class RoadmapNode(BaseModel):
+    id: str
+    title: str
+    stage_index: int
+    category: str = "essential"  # essential, recommended, specialization
+    description: str
+    key_skills: List[str]
+    project_challenge: str
+    resources: List[str] = []
+    prerequisites: List[str] = []
+
+
+class RoadmapStage(BaseModel):
+    stage_index: int
+    title: str
+    estimated_weeks: int
+    node_ids: List[str]
+
+
+class RoadmapResponse(BaseModel):
+    profession: str
+    experience_level: str
+    summary: str
+    salary_range: str
+    estimated_months: int
+    stages: List[RoadmapStage]
+    nodes: List[RoadmapNode]
+
+
+class RoadmapGenerateRequest(BaseModel):
+    profession: str
+    experience_level: str = "beginner"  # beginner, intermediate, career_switcher

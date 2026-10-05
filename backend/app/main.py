@@ -14,7 +14,10 @@ from app.models import (
     DiagnosticReport,
     MilestonePathway,
     RoleRoiRecommendation,
+    RoadmapResponse,
+    RoadmapGenerateRequest,
 )
+from app.roadmap_generator import roadmap_generator
 
 # Initialize FastAPI application
 app = FastAPI(
@@ -169,3 +172,21 @@ async def parse_resume(request: Request) -> ResumeParseResponse:
         detected_role=result["detected_role"],
         extracted_skills=result["extracted_skills"],
     )
+
+
+@app.post("/api/roadmap/generate", response_model=RoadmapResponse)
+def generate_profession_roadmap(payload: RoadmapGenerateRequest) -> RoadmapResponse:
+    """Generates an end-to-end, visual flow-tree roadmap for any requested profession."""
+    if not payload.profession or not payload.profession.strip():
+        raise HTTPException(status_code=400, detail="Profession name cannot be empty.")
+    return roadmap_generator.generate_dynamic_roadmap(
+        profession=payload.profession.strip(),
+        experience_level=payload.experience_level,
+    )
+
+
+@app.get("/api/roadmap/suggestions", response_model=List[str])
+def get_roadmap_suggestions() -> List[str]:
+    """Returns curated popular professions for instant inspiration."""
+    return roadmap_generator.get_suggestions()
+

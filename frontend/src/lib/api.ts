@@ -9,6 +9,8 @@ import {
   RoleRoiRecommendation,
   ResumeParseRequest,
   ResumeParseResponse,
+  RoadmapResponse,
+  RoadmapGenerateRequest,
 } from "@/types";
 
 export class ApiError extends Error {
@@ -149,6 +151,25 @@ export async function parseResume(
   });
 }
 
+/**
+ * Generates an end-to-end, visual flow-tree roadmap for any requested profession
+ */
+export async function generateRoadmap(
+  payload: RoadmapGenerateRequest
+): Promise<RoadmapResponse> {
+  return request<RoadmapResponse>("/api/roadmap/generate", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+/**
+ * Returns popular profession suggestions for instant inspiration
+ */
+export async function getSuggestions(): Promise<string[]> {
+  return request<string[]>("/api/roadmap/suggestions", { method: "GET" });
+}
+
 export const api = {
   getHealth,
   getRolesGraph,
@@ -156,6 +177,8 @@ export const api = {
   generatePathway,
   simulateRoi,
   parseResume,
+  generateRoadmap,
+  getSuggestions,
 };
 
 export default api;
