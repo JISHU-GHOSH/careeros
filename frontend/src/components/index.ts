@@ -3,3 +3,6 @@ export * from "./TrajectoryMap";
 export * from "./Header";
 export * from "./SkillItem";
 export * from "./SkillMatrix";
+export * from "./TaskCard";
+export * from "./MentorCard";
+export * from "./MilestonePathway";
