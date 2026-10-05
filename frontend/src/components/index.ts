@@ -6,3 +6,5 @@ export * from "./SkillMatrix";
 export * from "./TaskCard";
 export * from "./MentorCard";
 export * from "./MilestonePathway";
+export * from "./ResumeDropzone";
+export * from "./OnboardingModal";
