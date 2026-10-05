@@ -220,6 +220,26 @@ export function ResumeDropzone({
       setUploadedFileName(file.name);
       setParseError(null);
 
+      // Directly use FormData for PDF uploads to prevent binary text corruption
+      if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
+        const formData = new FormData();
+        formData.append("file", file);
+        setIsParsing(true);
+        api
+          .parseResume(formData)
+          .then((res) => {
+            setParsedResult(res);
+            onParsed?.(res, `File: ${file.name}`);
+          })
+          .catch(() => {
+            const fallback = localFallbackParse(file.name);
+            setParsedResult(fallback);
+            onParsed?.(fallback, file.name);
+          })
+          .finally(() => setIsParsing(false));
+        return;
+      }
+
       // Plaintext or markdown files can be read directly
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -426,7 +446,7 @@ export function ResumeDropzone({
               className={cn(
                 "w-full rounded-xl p-3.5 text-xs font-mono bg-secondary/30 border border-border/80",
                 "text-foreground placeholder:text-muted-foreground/60 resize-y",
-                "focus:outline-hidden focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
+                "focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
               )}
             />
 

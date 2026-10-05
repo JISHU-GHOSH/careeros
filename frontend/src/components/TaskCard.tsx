@@ -105,7 +105,7 @@ export function TaskCard({
               }
             }}
             className={cn(
-              "shrink-0 mt-0.5 w-6 h-6 rounded-lg border flex items-center justify-center transition-all duration-150 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary",
+              "shrink-0 mt-0.5 w-6 h-6 rounded-lg border flex items-center justify-center transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
               task.completed
                 ? "bg-emerald-500 border-emerald-500 text-white shadow-xs shadow-emerald-500/30 scale-100"
                 : "border-border/80 bg-secondary/60 hover:bg-secondary hover:border-primary/60 text-transparent active:scale-90"
@@ -185,7 +185,7 @@ export function TaskCard({
                 type="button"
                 onClick={handleAction}
                 className={cn(
-                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors border shadow-2xs focus:outline-hidden",
+                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors border shadow-2xs focus:outline-none",
                   isHandsOn
                     ? "bg-secondary hover:bg-secondary/80 text-foreground border-border/70 hover:border-primary/50"
                     : "bg-secondary/60 hover:bg-secondary text-muted-foreground hover:text-foreground border-border/60"

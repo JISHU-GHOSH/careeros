@@ -173,7 +173,7 @@ export function SkillItem({
             handleToggle();
           }
         }}
-        className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer select-none focus:outline-hidden"
+        className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer select-none focus:outline-none"
       >
         {/* Left: Status Icon, Title, and Category */}
         <div className="flex items-start gap-3 min-w-0 flex-1">

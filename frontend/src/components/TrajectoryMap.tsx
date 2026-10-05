@@ -340,7 +340,7 @@ export function TrajectoryMap({
                     }}
                     className={cn(
                       "relative z-10 p-4 rounded-xl border text-left transition-all duration-200 cursor-pointer",
-                      "focus:outline-hidden focus:ring-2 focus:ring-primary/50",
+                      "focus:outline-none focus:ring-2 focus:ring-primary/50",
                       // State-specific borders & styling
                       state === "completed" && [
                         "border-emerald-500/40 bg-emerald-950/10 hover:border-emerald-500/60",

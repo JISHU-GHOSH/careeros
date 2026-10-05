@@ -95,7 +95,7 @@ export function Header({
         <div className="flex items-center gap-3 shrink-0">
           <a
             href="/"
-            className="flex items-center gap-2.5 group focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary rounded-lg p-1"
+            className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg p-1"
           >
             <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-primary to-indigo-600 flex items-center justify-center text-primary-foreground shadow-md shadow-primary/20 group-hover:scale-105 transition-transform">
               <Compass className="w-5 h-5 text-white" />
@@ -254,7 +254,7 @@ export function Header({
             <button
               type="button"
               onClick={() => setIsUserMenuOpen((prev) => !prev)}
-              className="flex items-center gap-1.5 p-1 rounded-full hover:ring-2 hover:ring-border transition-all focus:outline-hidden"
+              className="flex items-center gap-1.5 p-1 rounded-full hover:ring-2 hover:ring-border transition-all focus:outline-none"
               aria-expanded={isUserMenuOpen}
               aria-haspopup="true"
               aria-label="User account menu"

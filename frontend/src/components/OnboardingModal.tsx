@@ -42,15 +42,18 @@ export interface OnboardingModalProps {
 
 export type TransitionMode = "fast_track" | "lateral_pivot";
 
+interface CalibrationOption {
+  depth: SkillDepth;
+  label: string;
+  sublabel: string;
+  confidence: number;
+}
+
 interface CalibrationQuestion {
   skillId: string;
   title: string;
   description: string;
-  options: {
-    depth: SkillDepth;
-    label: string;
-    sublabel: string;
-  }[];
+  options: CalibrationOption[];
 }
 
 const CALIBRATION_QUESTIONS: CalibrationQuestion[] = [
@@ -62,23 +65,21 @@ const CALIBRATION_QUESTIONS: CalibrationQuestion[] = [
     options: [
       {
         depth: SkillDepth.CONCEPTUAL,
-        label: "None / Exploring",
-        sublabel: "Familiar with key-value concepts, haven't shipped to production.",
-      },
-      {
-        depth: SkillDepth.CONCEPTUAL,
-        label: "Conceptual",
-        sublabel: "Understand cache-aside, eviction policies (LRU), and basic GET/SET.",
+        label: "Foundational Concepts",
+        sublabel: "Understand cache-aside, TTL expiry, eviction policies (LRU), and basic GET/SET.",
+        confidence: 0.4,
       },
       {
         depth: SkillDepth.APPLIED,
-        label: "Applied (Production)",
-        sublabel: "Built Redis clusters, cache-aside layers, and pub/sub cache invalidation.",
+        label: "Applied / Production Code",
+        sublabel: "Built Redis clusters, cache-aside layers, and pub/sub cache invalidation in production.",
+        confidence: 0.8,
       },
       {
         depth: SkillDepth.ARCHITECTURAL,
-        label: "Architectural (Lead)",
-        sublabel: "Designed planetary-scale multi-tier caching, thundering herd defense, & failover.",
+        label: "Architectural & Optimization",
+        sublabel: "Designed planetary-scale multi-tier caching, thundering herd defense, & edge resilience.",
+        confidence: 0.95,
       },
     ],
   },
@@ -90,23 +91,21 @@ const CALIBRATION_QUESTIONS: CalibrationQuestion[] = [
     options: [
       {
         depth: SkillDepth.CONCEPTUAL,
-        label: "Monolith Only",
-        sublabel: "Delivered standard CRUD applications on monolithic codebases.",
-      },
-      {
-        depth: SkillDepth.CONCEPTUAL,
-        label: "Conceptual",
-        sublabel: "Know CAP theorem, rate limiting, and basic message queue concepts.",
+        label: "Foundational Concepts",
+        sublabel: "Know monolith vs microservices, CAP theorem, and basic load balancing trade-offs.",
+        confidence: 0.4,
       },
       {
         depth: SkillDepth.APPLIED,
-        label: "Applied (Production)",
-        sublabel: "Architected microservices, asynchronous message queues, and API gateways.",
+        label: "Applied / Production Code",
+        sublabel: "Architected production microservices, async message queues, and resilient API gateways.",
+        confidence: 0.8,
       },
       {
         depth: SkillDepth.ARCHITECTURAL,
-        label: "Architectural (Lead)",
-        sublabel: "Designed distributed multi-region topologies, consensus, and fault isolation.",
+        label: "Architectural & Optimization",
+        sublabel: "Designed distributed multi-region topologies, consensus protocols, and fault isolation.",
+        confidence: 0.95,
       },
     ],
   },
@@ -118,23 +117,21 @@ const CALIBRATION_QUESTIONS: CalibrationQuestion[] = [
     options: [
       {
         depth: SkillDepth.CONCEPTUAL,
-        label: "Basic SQL",
-        sublabel: "Write standard SELECT, JOIN, and INSERT statements.",
-      },
-      {
-        depth: SkillDepth.CONCEPTUAL,
-        label: "Conceptual",
-        sublabel: "Understand B-Tree indexes, foreign keys, and transactions (ACID).",
+        label: "Foundational Concepts",
+        sublabel: "Proficient in relational schemas, JOINs, B-Tree indexes, and ACID transaction semantics.",
+        confidence: 0.4,
       },
       {
         depth: SkillDepth.APPLIED,
-        label: "Applied (Production)",
-        sublabel: "Tune queries using EXPLAIN ANALYZE, composite indexes, and connection pools.",
+        label: "Applied / Production Code",
+        sublabel: "Tuned slow production queries using EXPLAIN ANALYZE, composite indexes, and connection pools.",
+        confidence: 0.8,
       },
       {
         depth: SkillDepth.ARCHITECTURAL,
-        label: "Architectural (Lead)",
-        sublabel: "Implemented sharding, table partitioning, replication lag defenses, & failover.",
+        label: "Architectural & Optimization",
+        sublabel: "Engineered table partitioning, read-replica routing, sharding, and high-concurrency writes.",
+        confidence: 0.95,
       },
     ],
   },
@@ -164,6 +161,7 @@ export function OnboardingModal({
     setUserSkills,
     recalibrateDiagnostics,
     refreshPathways,
+    applyOnboardingProfile,
   } = useCareerSafe();
 
   // Wizard Step (1: Starting Point, 2: Destination, 3: Skill Calibration, 4: Calibrated Success)
@@ -255,6 +253,12 @@ export function OnboardingModal({
 
   // Compute live estimated starting readiness score dynamically in Step 3
   const dynamicReadinessScore = useMemo(() => {
+    const depthConfidenceMap: Record<SkillDepth, number> = {
+      [SkillDepth.CONCEPTUAL]: 0.4,
+      [SkillDepth.APPLIED]: 0.8,
+      [SkillDepth.ARCHITECTURAL]: 0.95,
+    };
+
     // Build temporary user skill state incorporating calibrated answers
     const tempSkills: UserSkillState[] = [
       ...contextUserSkills.filter(
@@ -266,19 +270,22 @@ export function OnboardingModal({
       {
         skill_id: "distributed-caching",
         current_depth: calibratedDepths["distributed-caching"] || SkillDepth.APPLIED,
-        confidence_score: 0.85,
+        confidence_score:
+          depthConfidenceMap[calibratedDepths["distributed-caching"] || SkillDepth.APPLIED],
         verification_source: "SELF_REPORT",
       },
       {
         skill_id: "system-design",
         current_depth: calibratedDepths["system-design"] || SkillDepth.CONCEPTUAL,
-        confidence_score: 0.8,
+        confidence_score:
+          depthConfidenceMap[calibratedDepths["system-design"] || SkillDepth.CONCEPTUAL],
         verification_source: "SELF_REPORT",
       },
       {
         skill_id: "sql-optimization",
         current_depth: calibratedDepths["sql-optimization"] || SkillDepth.APPLIED,
-        confidence_score: 0.85,
+        confidence_score:
+          depthConfidenceMap[calibratedDepths["sql-optimization"] || SkillDepth.APPLIED],
         verification_source: "SELF_REPORT",
       },
     ];
@@ -310,26 +317,30 @@ export function OnboardingModal({
         resumeParsedData.extracted_skills.forEach((s) => skillsMap.set(s.skill_id, s));
       }
 
-      // Apply calibrated questionnaire depths
+      // Apply calibrated questionnaire depths with distinct confidence scores
+      const depthConfidenceMap: Record<SkillDepth, number> = {
+        [SkillDepth.CONCEPTUAL]: 0.4,
+        [SkillDepth.APPLIED]: 0.8,
+        [SkillDepth.ARCHITECTURAL]: 0.95,
+      };
+
       Object.entries(calibratedDepths).forEach(([skillId, depth]) => {
         const existing = skillsMap.get(skillId);
+        const calibratedConf = depthConfidenceMap[depth] || 0.8;
         skillsMap.set(skillId, {
           skill_id: skillId,
           current_depth: depth,
-          confidence_score: existing ? Math.max(existing.confidence_score, 0.85) : 0.85,
+          confidence_score: existing
+            ? Math.max(existing.confidence_score, calibratedConf)
+            : calibratedConf,
           verification_source: existing?.verification_source || "SELF_REPORT",
         });
       });
 
       const finalSkillsList = Array.from(skillsMap.values());
 
-      // 2. Hydrate CareerContext
-      setCurrentRoleId(selectedCurrentRole);
-      setTargetRoleId(selectedTargetRole);
-      setUserSkills(finalSkillsList);
-
-      // 3. Recalibrate diagnostics and generate milestone pathways
-      await Promise.allSettled([recalibrateDiagnostics(), refreshPathways()]);
+      // 2. Hydrate CareerContext directly using applyOnboardingProfile (eliminates stale closures)
+      await applyOnboardingProfile(selectedCurrentRole, selectedTargetRole, finalSkillsList);
 
       setIsSuccessComplete(true);
       setCurrentStep(4);
@@ -804,24 +815,29 @@ export function OnboardingModal({
                         </p>
                       </div>
 
-                      {/* 4-Stop Depth Segmented Buttons */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {/* 3-Stop Depth Segmented Buttons */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                         {question.options.map((opt) => {
                           const isSelected = currentDepth === opt.depth;
 
                           return (
                             <button
-                              key={opt.label}
+                              key={opt.depth}
                               type="button"
                               onClick={() => handleSelectDepth(question.skillId, opt.depth)}
                               className={cn(
-                                "p-2 rounded-lg border text-left transition-all",
+                                "p-3 rounded-xl border text-left transition-all",
                                 isSelected
-                                  ? "border-primary bg-primary/15 text-foreground ring-1 ring-primary shadow-2xs"
+                                  ? "border-primary bg-primary/15 text-foreground ring-1 ring-primary shadow-xs"
                                   : "border-border/50 bg-secondary/40 text-muted-foreground hover:bg-secondary hover:text-foreground"
                               )}
                             >
-                              <span className="text-[11px] font-bold block">{opt.label}</span>
+                              <div className="flex items-center justify-between gap-1 mb-1">
+                                <span className="text-[11px] font-bold block">{opt.label}</span>
+                                {isSelected && (
+                                  <Check className="w-3.5 h-3.5 text-primary shrink-0" />
+                                )}
+                              </div>
                               <span className="text-[10px] text-muted-foreground line-clamp-2 mt-0.5">
                                 {opt.sublabel}
                               </span>

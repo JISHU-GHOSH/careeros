@@ -437,7 +437,7 @@ export function SkillMatrix({
               className={cn(
                 "w-full pl-9 pr-8 py-1.5 rounded-xl text-xs bg-secondary/50 border border-border/70",
                 "text-foreground placeholder:text-muted-foreground/70",
-                "focus:outline-hidden focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
+                "focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors"
               )}
             />
             {searchQuery && (
@@ -508,7 +508,7 @@ export function SkillMatrix({
                 onChange={(e) =>
                   setSortBy(e.target.value as "priority" | "demand" | "alphabetical")
                 }
-                className="bg-transparent text-foreground text-[11px] font-medium focus:outline-hidden cursor-pointer"
+                className="bg-transparent text-foreground text-[11px] font-medium focus:outline-none cursor-pointer"
                 aria-label="Sort skills by"
               >
                 <option value="priority">Priority Gap</option>

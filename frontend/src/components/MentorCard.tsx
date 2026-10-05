@@ -338,7 +338,7 @@ export function MentorCard({
                   value={syncNotes}
                   onChange={(e) => setSyncNotes(e.target.value)}
                   rows={3}
-                  className="w-full p-3 rounded-xl bg-secondary/50 border border-border/70 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-hidden focus:ring-1 focus:ring-primary focus:border-primary transition-colors resize-none"
+                  className="w-full p-3 rounded-xl bg-secondary/50 border border-border/70 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-colors resize-none"
                   placeholder="E.g. Would love your feedback on my Redis cache-aside implementation and eviction strategy..."
                 />
               </div>

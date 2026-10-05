@@ -54,13 +54,25 @@ export interface CareerContextValue {
   setTargetRoleId: (roleId: string) => void;
   toggleStealthMode: (enabled?: boolean) => void;
   setUserSkills: (skills: UserSkillState[]) => void;
-  recalibrateDiagnostics: () => Promise<void>;
+  recalibrateDiagnostics: (
+    overrideSkills?: UserSkillState[],
+    overrideTargetRoleId?: string,
+    overrideCurrentRoleId?: string
+  ) => Promise<DiagnosticReport | null>;
   bookMentorSync: (
     mentorName: string,
     timeSlot: string,
     notes?: string
   ) => Promise<{ success: boolean; message: string }>;
-  refreshPathways: () => Promise<void>;
+  refreshPathways: (
+    overrideTargetRoleId?: string,
+    overrideGapSkillIds?: string[]
+  ) => Promise<void>;
+  applyOnboardingProfile: (
+    currentRoleId: string,
+    targetRoleId: string,
+    skills: UserSkillState[]
+  ) => Promise<void>;
 }
 
 // Resilient seed roles matching backend ontology
@@ -708,48 +720,133 @@ export function CareerProvider({
     setStealthMode((prev) => (enabled !== undefined ? enabled : !prev));
   }, []);
 
-  const recalibrateDiagnostics = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const report = await api.analyzeDiagnostics({
-        current_role_id: currentRoleId,
-        target_role_id: targetRoleId,
-        user_skills: userSkills,
-      });
-      if (report) {
-        setDiagnosticReport(report);
-        setReadinessScore(report.readiness_percentage);
-      }
-      setLastSyncedAt(new Date());
-    } catch {
-      // Recalibrate locally with formula
-      const localScore = calculateWeightedReadiness(userSkills, targetRole);
-      setReadinessScore(localScore);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentRoleId, targetRoleId, userSkills, targetRole]);
+  const recalibrateDiagnostics = useCallback(
+    async (
+      overrideSkills?: UserSkillState[],
+      overrideTargetRoleId?: string,
+      overrideCurrentRoleId?: string
+    ) => {
+      setIsLoading(true);
+      const activeCurrentId = overrideCurrentRoleId || currentRoleId;
+      const activeTargetId = overrideTargetRoleId || targetRoleId;
+      const activeSkills = overrideSkills || userSkills;
+      const activeMatchedTargetRole =
+        roles.find((r) => r.id === activeTargetId) ||
+        DEFAULT_ROLES.find((r) => r.id === activeTargetId) ||
+        targetRole;
 
-  const refreshPathways = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const gapIds = diagnosticReport?.missing_gaps?.map((g) => g.id) || [
-        "distributed-caching",
-        "system-design",
-      ];
-      const generated = await api.generatePathway({
-        target_role_id: targetRoleId,
-        gap_skill_ids: gapIds,
-      });
-      if (generated && generated.length > 0) {
-        setPathways(generated);
+      try {
+        const report = await api.analyzeDiagnostics({
+          current_role_id: activeCurrentId,
+          target_role_id: activeTargetId,
+          user_skills: activeSkills,
+        });
+        if (report) {
+          setDiagnosticReport(report);
+          setReadinessScore(report.readiness_percentage);
+        }
+        setLastSyncedAt(new Date());
+        return report;
+      } catch {
+        // Recalibrate locally with formula
+        const localScore = calculateWeightedReadiness(activeSkills, activeMatchedTargetRole);
+        setReadinessScore(localScore);
+        return null;
+      } finally {
+        setIsLoading(false);
       }
-    } catch {
-      // Retain existing pathways on failure
-    } finally {
-      setIsLoading(false);
-    }
-  }, [targetRoleId, diagnosticReport]);
+    },
+    [currentRoleId, targetRoleId, userSkills, targetRole, roles]
+  );
+
+  const refreshPathways = useCallback(
+    async (overrideTargetRoleId?: string, overrideGapSkillIds?: string[]) => {
+      setIsLoading(true);
+      const activeTargetId = overrideTargetRoleId || targetRoleId;
+      const gapIds =
+        overrideGapSkillIds ||
+        diagnosticReport?.missing_gaps?.map((g) => g.id) || [
+          "distributed-caching",
+          "system-design",
+        ];
+
+      try {
+        const generated = await api.generatePathway({
+          target_role_id: activeTargetId,
+          gap_skill_ids: gapIds,
+        });
+        if (generated && generated.length > 0) {
+          setPathways(generated);
+        }
+      } catch {
+        // Retain existing pathways on failure
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [targetRoleId, diagnosticReport]
+  );
+
+  const applyOnboardingProfile = useCallback(
+    async (newCurrentRoleId: string, newTargetRoleId: string, newSkills: UserSkillState[]) => {
+      setIsLoading(true);
+
+      // 1. Immediately update client state
+      setCurrentRoleId(newCurrentRoleId);
+      setTargetRoleId(newTargetRoleId);
+      setUserSkills(newSkills);
+
+      const matchedTargetRole =
+        roles.find((r) => r.id === newTargetRoleId) ||
+        DEFAULT_ROLES.find((r) => r.id === newTargetRoleId) ||
+        DEFAULT_ROLES[2];
+
+      const immediateScore = calculateWeightedReadiness(newSkills, matchedTargetRole);
+      setReadinessScore(immediateScore);
+
+      // 2. Query backend diagnostics directly with fresh arguments (bypassing stale closure)
+      try {
+        let verifiedReport: DiagnosticReport | null = null;
+        try {
+          verifiedReport = await api.analyzeDiagnostics({
+            current_role_id: newCurrentRoleId,
+            target_role_id: newTargetRoleId,
+            user_skills: newSkills,
+          });
+        } catch {
+          // Graceful fallback to local report
+        }
+
+        if (verifiedReport) {
+          setDiagnosticReport(verifiedReport);
+          setReadinessScore(verifiedReport.readiness_percentage);
+        }
+
+        const gapIds = verifiedReport?.missing_gaps?.map((g) => g.id) || [
+          "distributed-caching",
+          "system-design",
+        ];
+
+        // 3. Generate pathways for the new target role and gaps
+        try {
+          const generatedPathways = await api.generatePathway({
+            target_role_id: newTargetRoleId,
+            gap_skill_ids: gapIds,
+          });
+          if (generatedPathways && generatedPathways.length > 0) {
+            setPathways(generatedPathways);
+          }
+        } catch {
+          // Keep existing pathways
+        }
+
+        setLastSyncedAt(new Date());
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [roles]
+  );
 
   const bookMentorSync = useCallback(
     async (mentorName: string, timeSlot: string, notes?: string) => {
@@ -796,6 +893,7 @@ export function CareerProvider({
     recalibrateDiagnostics,
     bookMentorSync,
     refreshPathways,
+    applyOnboardingProfile,
   };
 
   return <CareerContext.Provider value={contextValue}>{children}</CareerContext.Provider>;
@@ -841,11 +939,12 @@ export function useCareerSafe(): CareerContextValue {
     setTargetRoleId: () => {},
     toggleStealthMode: () => {},
     setUserSkills: () => {},
-    recalibrateDiagnostics: async () => {},
+    recalibrateDiagnostics: async () => null,
     bookMentorSync: async () => ({
       success: true,
       message: "Sync confirmed.",
     }),
     refreshPathways: async () => {},
+    applyOnboardingProfile: async () => {},
   };
 }

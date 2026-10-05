@@ -205,7 +205,7 @@ export function MilestonePathway({
                 type="button"
                 onClick={() => handleSelectMilestone(pathway.milestone_index)}
                 className={cn(
-                  "p-3 rounded-xl border text-left transition-all relative overflow-hidden select-none focus:outline-hidden",
+                  "p-3 rounded-xl border text-left transition-all relative overflow-hidden select-none focus:outline-none",
                   isSelected
                     ? "border-primary bg-primary/10 text-foreground ring-1 ring-primary/40 shadow-xs"
                     : "border-border/70 bg-secondary/40 text-muted-foreground hover:bg-secondary hover:text-foreground"
