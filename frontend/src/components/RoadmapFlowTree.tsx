@@ -100,9 +100,29 @@ export function RoadmapFlowTree({
       <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold">
-              <Compass className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Career Roadmap for</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold">
+                <Compass className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Career Roadmap</span>
+              </div>
+              {roadmap.source === "groq" && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 text-purple-700 text-xs font-bold shadow-2xs">
+                  <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                  <span>Synthesized via Groq Llama 3.3</span>
+                </div>
+              )}
+              {roadmap.source === "curated" && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-2xs">
+                  <Award className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Curated Master Curriculum</span>
+                </div>
+              )}
+              {roadmap.source === "archetype" && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold shadow-2xs">
+                  <Layers className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Domain Specialized Curriculum</span>
+                </div>
+              )}
             </div>
             <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
               {roadmap.profession}

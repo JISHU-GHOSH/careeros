@@ -100,8 +100,11 @@ class RoadmapResponse(BaseModel):
     estimated_months: int
     stages: List[RoadmapStage]
     nodes: List[RoadmapNode]
+    source: Optional[str] = "curated"  # "groq", "curated", "archetype", "synthesizer"
 
 
 class RoadmapGenerateRequest(BaseModel):
     profession: str
     experience_level: str = "beginner"  # beginner, intermediate, career_switcher
+    api_key: Optional[str] = None
+

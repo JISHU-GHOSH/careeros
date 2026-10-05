@@ -169,10 +169,18 @@ export interface RoadmapResponse {
   estimated_months: number;
   stages: RoadmapStage[];
   nodes: RoadmapNode[];
+  source?: "groq" | "curated" | "archetype" | "synthesizer";
 }
 
 export interface RoadmapGenerateRequest {
   profession: string;
   experience_level?: "beginner" | "intermediate" | "career_switcher";
+  api_key?: string;
+}
+
+export interface RoadmapStatusResponse {
+  groq_configured: boolean;
+  model: string;
+  supported_models: string[];
 }
 

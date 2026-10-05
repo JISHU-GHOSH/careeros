@@ -1,8 +1,12 @@
 import os
 from typing import List, Optional, Dict, Any, Union
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+# Load environment configuration (.env)
+load_dotenv()
 
 from app.graph import CareerGraphEngine
 from app.diagnostics import DiagnosticsEngine
@@ -18,6 +22,7 @@ from app.models import (
     RoadmapGenerateRequest,
 )
 from app.roadmap_generator import roadmap_generator
+from app.groq_service import is_groq_configured
 
 # Initialize FastAPI application
 app = FastAPI(
@@ -182,6 +187,7 @@ def generate_profession_roadmap(payload: RoadmapGenerateRequest) -> RoadmapRespo
     return roadmap_generator.generate_dynamic_roadmap(
         profession=payload.profession.strip(),
         experience_level=payload.experience_level,
+        api_key=payload.api_key,
     )
 
 
@@ -189,4 +195,20 @@ def generate_profession_roadmap(payload: RoadmapGenerateRequest) -> RoadmapRespo
 def get_roadmap_suggestions() -> List[str]:
     """Returns curated popular professions for instant inspiration."""
     return roadmap_generator.get_suggestions()
+
+
+class RoadmapStatusResponse(BaseModel):
+    groq_configured: bool
+    model: str
+    supported_models: List[str]
+
+
+@app.get("/api/roadmap/status", response_model=RoadmapStatusResponse)
+def get_roadmap_status() -> RoadmapStatusResponse:
+    """Returns AI status and Groq configuration state."""
+    return RoadmapStatusResponse(
+        groq_configured=is_groq_configured(),
+        model="llama-3.3-70b-versatile",
+        supported_models=["llama-3.3-70b-versatile", "llama-3.1-8b-instant"],
+    )
 

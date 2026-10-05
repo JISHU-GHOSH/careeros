@@ -30,15 +30,22 @@ export default function HomePage() {
 
   const handleSearch = async (
     profession: string,
-    experienceLevel: "beginner" | "intermediate" | "career_switcher"
+    experienceLevel: "beginner" | "intermediate" | "career_switcher",
+    apiKey?: string
   ) => {
     try {
       setIsLoading(true);
       setError(null);
       setSearchQuery(profession);
+      const effectiveKey =
+        apiKey ||
+        (typeof window !== "undefined"
+          ? localStorage.getItem("groq_api_key") || undefined
+          : undefined);
       const data = await api.generateRoadmap({
         profession,
         experience_level: experienceLevel,
+        api_key: effectiveKey,
       });
       setCurrentRoadmap(data);
     } catch (err: any) {

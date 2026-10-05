@@ -11,6 +11,7 @@ from app.models import (
     RoadmapStage,
     RoadmapResponse,
 )
+from app.groq_service import generate_roadmap_with_groq
 
 # Comprehensive Curated Knowledge Base for Top Global Professions
 CURATED_ROADMAPS: Dict[str, Dict[str, Any]] = {
@@ -1406,10 +1407,20 @@ class UniversalRoadmapGenerator:
         return None
 
     def generate_dynamic_roadmap(
-        self, profession: str, experience_level: str = "beginner"
+        self, profession: str, experience_level: str = "beginner", api_key: Optional[str] = None
     ) -> RoadmapResponse:
         """Synthesizes an intelligent, structured roadmap for any career path."""
         norm_title = profession.strip().title()
+
+        # 0. Dynamic Groq Cloud LLM Generation (if configured or key provided)
+        groq_roadmap = generate_roadmap_with_groq(
+            profession=profession,
+            experience_level=experience_level,
+            api_key=api_key,
+        )
+        if groq_roadmap:
+            groq_roadmap.source = "groq"
+            return groq_roadmap
 
         # 1. Curated specific roadmap match
         curated = self.find_curated_match(profession)
@@ -1422,6 +1433,7 @@ class UniversalRoadmapGenerator:
                 estimated_months=curated["estimated_months"],
                 stages=[RoadmapStage(**s) for s in curated["stages"]],
                 nodes=[RoadmapNode(**n) for n in curated["nodes"]],
+                source="curated",
             )
 
         clean_slug = self.normalize_key(profession)
@@ -1490,6 +1502,7 @@ class UniversalRoadmapGenerator:
                 estimated_months=8 if experience_level == "beginner" else 5,
                 stages=stages,
                 nodes=nodes,
+                source="archetype",
             )
 
         # 3. Intelligent Generalized Synthesizer for arbitrary unlisted professions
@@ -1625,6 +1638,7 @@ class UniversalRoadmapGenerator:
             estimated_months=8 if experience_level == "beginner" else 5,
             stages=stages,
             nodes=nodes,
+            source="synthesizer",
         )
 
     def get_suggestions(self) -> List[str]:

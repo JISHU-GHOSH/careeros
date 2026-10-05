@@ -11,6 +11,7 @@ import {
   ResumeParseResponse,
   RoadmapResponse,
   RoadmapGenerateRequest,
+  RoadmapStatusResponse,
 } from "@/types";
 
 export class ApiError extends Error {
@@ -170,6 +171,13 @@ export async function getSuggestions(): Promise<string[]> {
   return request<string[]>("/api/roadmap/suggestions", { method: "GET" });
 }
 
+/**
+ * Returns AI status and Groq configuration state
+ */
+export async function getRoadmapStatus(): Promise<RoadmapStatusResponse> {
+  return request<RoadmapStatusResponse>("/api/roadmap/status", { method: "GET" });
+}
+
 export const api = {
   getHealth,
   getRolesGraph,
@@ -179,6 +187,7 @@ export const api = {
   parseResume,
   generateRoadmap,
   getSuggestions,
+  getRoadmapStatus,
 };
 
 export default api;
