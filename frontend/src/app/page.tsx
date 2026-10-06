@@ -113,13 +113,31 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Loading Shimmer State */}
-        {isLoading && !currentRoadmap && (
-          <div className="space-y-6 animate-pulse">
-            <div className="h-44 bg-slate-200/80 rounded-3xl" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="h-48 bg-slate-200/80 rounded-2xl" />
-              <div className="h-48 bg-slate-200/80 rounded-2xl" />
+        {/* Loading Synthesizer State */}
+        {isLoading && (
+          <div className="rounded-3xl border border-indigo-200 bg-white/90 backdrop-blur-md p-8 sm:p-12 shadow-xl shadow-indigo-100/50 text-center space-y-6 animate-in fade-in duration-300">
+            <div className="relative mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+              <Sparkles className="w-8 h-8 animate-spin" style={{ animationDuration: "3s" }} />
+              <div className="absolute -inset-1 rounded-2xl bg-indigo-400/30 blur-md animate-pulse -z-10" />
+            </div>
+
+            <div className="space-y-2 max-w-md mx-auto">
+              <h3 className="text-xl font-black text-slate-900 tracking-tight">
+                Architecting Career Curriculum...
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                Synthesizing authentic 5-stage milestones, core toolchains, and flagship capstones for{" "}
+                <strong className="text-indigo-600 font-semibold">{searchQuery || "your profession"}</strong>.
+              </p>
+            </div>
+
+            <div className="max-w-xs mx-auto space-y-2">
+              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 rounded-full animate-pulse w-3/4" />
+              </div>
+              <p className="text-[11px] text-slate-400 font-medium">
+                Using built-in Groq AI engine • ~2-4s response
+              </p>
             </div>
           </div>
         )}

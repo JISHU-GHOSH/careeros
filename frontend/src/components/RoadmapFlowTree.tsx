@@ -108,7 +108,7 @@ export function RoadmapFlowTree({
               {roadmap.source === "groq" && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 text-purple-700 text-xs font-bold shadow-2xs">
                   <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-                  <span>Synthesized via Groq Llama 3.3</span>
+                  <span>Synthesized via Built-in Groq AI</span>
                 </div>
               )}
               {roadmap.source === "curated" && (

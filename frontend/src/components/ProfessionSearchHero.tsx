@@ -113,63 +113,65 @@ export function ProfessionSearchHero({
   return (
     <div
       className={cn(
-        "relative rounded-3xl border border-indigo-100 bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/20 p-6 sm:p-10 shadow-xs overflow-hidden",
+        "relative rounded-3xl border border-indigo-100/80 bg-white/85 backdrop-blur-xl p-6 sm:p-12 shadow-xl shadow-indigo-100/50 overflow-hidden transition-all",
         className
       )}
     >
       {/* Ambient background decoration */}
       <div
-        className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl"
+        className="pointer-events-none absolute -top-24 -right-24 w-96 h-96 bg-indigo-300/20 rounded-full blur-3xl animate-float-slow"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute -bottom-24 -left-24 w-96 h-96 bg-amber-200/15 rounded-full blur-3xl"
+        className="pointer-events-none absolute -bottom-24 -left-24 w-96 h-96 bg-purple-300/20 rounded-full blur-3xl animate-float-reverse"
         aria-hidden="true"
       />
 
-      <div className="relative z-10 max-w-3xl mx-auto text-center space-y-6">
+      <div className="relative z-10 max-w-3xl mx-auto text-center space-y-7">
         {/* Top Badges Bar */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-indigo-200/80 text-indigo-700 text-xs font-semibold shadow-2xs">
+        <div className="flex flex-wrap items-center justify-center gap-2.5">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-indigo-200/80 text-indigo-700 text-xs font-semibold shadow-xs">
             <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-spin" style={{ animationDuration: "6s" }} />
-            <span>Universal Career Roadmap Generator</span>
+            <span>Universal Career Roadmap Engine</span>
           </div>
 
-          {/* Groq AI Status Pill */}
-          <button
-            type="button"
-            onClick={() => setIsKeyModalOpen(true)}
-            className={cn(
-              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-2xs transition-all hover:scale-105 active:scale-95",
-              isGroqActive
-                ? "bg-emerald-50 border border-emerald-300 text-emerald-800"
-                : "bg-white border border-slate-200 text-slate-700 hover:border-indigo-300"
-            )}
-            title="Configure Groq API Key for live AI generation"
+          {/* Inbuilt AI Status Pill */}
+          <div
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 shadow-xs backdrop-blur-xs"
+            title="AI Roadmap Generation is built-in and always active"
           >
-            <Zap className={cn("w-3.5 h-3.5", isGroqActive ? "text-emerald-600 fill-emerald-500" : "text-amber-500")} />
-            <span>
-              {isGroqActive ? "Groq Llama 3.3 Active" : "Connect Groq API (Optional)"}
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span className="text-[10px] bg-white/80 px-1.5 py-0.5 rounded border border-slate-200 text-slate-500 font-mono">
+            <span className="font-bold">Inbuilt AI Live</span>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-medium">
+              Zero Setup Needed
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsKeyModalOpen(true)}
+              className="text-slate-400 hover:text-slate-600 transition-colors ml-0.5 text-[11px]"
+              title="Custom API Key (Optional Override)"
+            >
               ⚙️
-            </span>
-          </button>
+            </button>
+          </div>
         </div>
 
         {/* Heading */}
-        <div className="space-y-2">
-          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-            What do you want to become?
+        <div className="space-y-3">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.15]">
+            What do you want to <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">become</span>?
           </h1>
-          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto">
-            Type <strong className="font-semibold text-slate-800">any profession on earth</strong>—from Game Developer to Doctor—and get an instant, connected roadmap with real projects and tools.
+          <p className="text-slate-600 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+            Type <strong className="font-semibold text-slate-900">any profession on earth</strong>—from Game Developer to Neurosurgeon—and get an instant, milestone DAG roadmap with real tools and project challenges.
           </p>
         </div>
 
         {/* Main Search Bar Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="relative flex items-center shadow-md shadow-indigo-100/60 rounded-2xl bg-white border-2 border-indigo-200 focus-within:border-indigo-600 transition-all p-1.5">
+          <div className="relative flex items-center shadow-lg shadow-indigo-200/50 rounded-2xl bg-white border-2 border-indigo-200/90 focus-within:border-indigo-600 focus-within:ring-4 focus-within:ring-indigo-100 transition-all p-1.5">
             <div className="pl-3.5 pr-2 text-slate-400">
               <Search className="w-5 h-5 text-indigo-600" />
             </div>
@@ -184,12 +186,12 @@ export function ProfessionSearchHero({
             <button
               type="submit"
               disabled={isLoading || !query.trim()}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold text-sm shadow-xs transition-all shrink-0 active:scale-95"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:from-slate-300 disabled:to-slate-300 text-white font-bold text-sm shadow-md shadow-indigo-500/25 transition-all shrink-0 active:scale-95 cursor-pointer"
             >
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Generating...</span>
+                  <span>Synthesizing...</span>
                 </>
               ) : (
                 <>
@@ -201,10 +203,10 @@ export function ProfessionSearchHero({
           </div>
 
           {/* Experience Level Selector */}
-          <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
-            <span className="text-slate-500 font-medium mr-1">Experience:</span>
+          <div className="flex flex-wrap items-center justify-center gap-2 text-xs pt-1">
+            <span className="text-slate-500 font-semibold mr-1">Starting Point:</span>
             {[
-              { id: "beginner", label: "🌱 Beginner (From Scratch)" },
+              { id: "beginner", label: "🌱 Beginner (From Zero)" },
               { id: "intermediate", label: "⚡ Upskilling (Have Basics)" },
               { id: "career_switcher", label: "🔄 Career Switcher" },
             ].map((lvl) => (
@@ -213,10 +215,10 @@ export function ProfessionSearchHero({
                 type="button"
                 onClick={() => setExperienceLevel(lvl.id as any)}
                 className={cn(
-                  "px-3 py-1.5 rounded-lg border font-medium transition-all",
+                  "px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all",
                   experienceLevel === lvl.id
-                    ? "bg-indigo-50 border-indigo-300 text-indigo-900 font-semibold shadow-2xs"
-                    : "bg-white/80 border-slate-200 text-slate-600 hover:bg-white"
+                    ? "bg-indigo-600 border-indigo-600 text-white shadow-xs"
+                    : "bg-white/80 border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300"
                 )}
               >
                 {lvl.label}
@@ -228,7 +230,7 @@ export function ProfessionSearchHero({
         {/* Quick Inspiration Chips */}
         <div className="pt-2">
           <p className="text-xs text-slate-400 font-medium mb-2.5">
-            Or pick a popular profession to explore instantly:
+            Or click a popular profession to explore instantly:
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2">
             {INSPIRATION_PILLS.map((pill) => (
@@ -236,7 +238,7 @@ export function ProfessionSearchHero({
                 key={pill}
                 type="button"
                 onClick={() => handlePillClick(pill)}
-                className="px-3 py-1 rounded-full bg-white hover:bg-indigo-50 border border-slate-200/80 hover:border-indigo-200 text-xs font-medium text-slate-700 hover:text-indigo-700 shadow-2xs transition-all active:scale-95"
+                className="px-3 py-1 rounded-full bg-white/90 hover:bg-indigo-50 border border-slate-200/90 hover:border-indigo-300 text-xs font-medium text-slate-700 hover:text-indigo-700 shadow-2xs transition-all active:scale-95"
               >
                 {pill}
               </button>
