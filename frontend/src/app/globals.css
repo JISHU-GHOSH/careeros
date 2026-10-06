@@ -88,3 +88,56 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* Background Career Doodles & Floating Animations */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1.2deg);
+  }
+}
+
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(10px) rotate(-1.2deg);
+  }
+}
+
+@keyframes float-horizontal {
+  0%, 100% {
+    transform: translateX(0px) translateY(0px);
+  }
+  50% {
+    transform: translateX(10px) translateY(-6px);
+  }
+}
+
+@keyframes spin-very-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: float-reverse 8.5s ease-in-out infinite;
+}
+
+.animate-float-horizontal {
+  animation: float-horizontal 10s ease-in-out infinite;
+}
+
+.animate-spin-very-slow {
+  animation: spin-very-slow 50s linear infinite;
+}

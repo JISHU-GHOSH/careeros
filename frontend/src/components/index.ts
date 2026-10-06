@@ -11,4 +11,5 @@ export * from "./OnboardingModal";
 export * from "./ProfessionSearchHero";
 export * from "./RoadmapFlowTree";
 export * from "./RoadmapNodeDetail";
+export * from "./CareerBackgroundVisuals";
 

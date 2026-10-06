@@ -17,6 +17,7 @@ import {
 import {
   ProfessionSearchHero,
   RoadmapFlowTree,
+  CareerBackgroundVisuals,
 } from "@/components";
 import { RoadmapResponse } from "@/types";
 import { api } from "@/lib/api";
@@ -57,7 +58,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/70 text-slate-900 flex flex-col selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="relative min-h-screen bg-slate-50/70 text-slate-900 flex flex-col selection:bg-indigo-100 selection:text-indigo-900 overflow-x-hidden">
+      {/* Background Career Drawings, Logos & Blueprint Mesh */}
+      <CareerBackgroundVisuals />
+
       {/* Top Navbar */}
       <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
@@ -92,7 +96,7 @@ export default function HomePage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-12">
+      <main className="relative z-10 flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-12">
         {/* Search Hero Section */}
         <section id="search-hero">
           <ProfessionSearchHero
@@ -129,7 +133,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8 text-center text-xs text-slate-500">
+      <footer className="relative z-10 border-t border-slate-200/90 bg-white/80 backdrop-blur-md py-8 text-center text-xs text-slate-500">
         <div className="max-w-5xl mx-auto px-4 space-y-2">
           <p className="font-semibold text-slate-700">
             CareerOS — The Universal Profession Roadmap Generator
